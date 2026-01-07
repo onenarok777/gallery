@@ -37,8 +37,10 @@ export async function getDriveImages(searchQuery: string = "") {
       const previewSrc = thumb ? thumb.replace(/=s\d+$/, "=s1024") : "";
       const originalSrc = thumb ? thumb.replace(/=s\d+$/, "=s0") : file.webContentLink;
 
-      // Fallback: If no thumbnail, use proxy for the preview to ensure it loads
-      const finalSrc = previewSrc || (file.webContentLink ? `/api/proxy-image?url=${encodeURIComponent(file.webContentLink)}` : "");
+      // Fallback: If no thumbnail provided by API, try explicit thumbnail endpoint via proxy
+      // This handles cases where Drive API doesn't return thumbnailLink but the file is an image
+      const fallbackUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1024`;
+      const finalSrc = previewSrc || `/api/proxy-image?url=${encodeURIComponent(fallbackUrl)}`;
 
       return {
         id: file.id,

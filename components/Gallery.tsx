@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Masonry from "react-masonry-css";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -53,34 +53,21 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
     default: 4,
     1100: 3,
     700: 2,
-    500: 1,
+    500: 2, // Mobile 2 columns
   };
 
   return (
-    <div className="w-full">
-      {/* ... (downloadingId modal same as before) ... */}
-
-      <div className="mb-6 flex gap-2">
-        <input
-          type="text"
-          placeholder="Search images (e.g., 'face', 'cat')..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className="flex-1 p-3 border rounded-lg bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-400 dark:placeholder:text-zinc-500"
-        />
-        <button 
-          onClick={performSearch}
-          disabled={isSearching}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
-        >
-          {isSearching ? "..." : "Search"}
-        </button>
-      </div>
-
-      {images.length === 0 && !isSearching && (
-         <p className="text-center text-gray-500 mt-4">No images found matching "{search}"</p>
-      )}
+    <div 
+      className="w-full max-w-[1800px] mx-auto px-8 md:px-16 py-20"
+    >
+      <header className="mb-12 text-center">
+        <h1 className="text-5xl md:text-8xl font-serif text-white mb-6 tracking-[0.2em] uppercase font-thin slide-in-bottom" style={{ fontFamily: 'var(--font-playfair)' }}>
+          My Gallery
+        </h1>
+        <p className="text-neutral-500 text-xs tracking-[0.4em] uppercase font-medium">
+          Curated Collection
+        </p>
+      </header>
 
       <Masonry
         breakpointCols={breakpointColumnsObj}
@@ -90,15 +77,18 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
         {images.map((image, i) => (
           <div
             key={image.id}
-            className="mb-4 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
+            className="mb-1 group"
           >
-            <img
-                src={image.src}
-                alt={image.name || "Gallery Image"}
-                className="w-full h-auto cursor-pointer transform transition-transform duration-300 hover:scale-105"
-                loading="lazy"
-                onClick={() => setIndex(i)}
-            />
+            <div className="relative overflow-hidden bg-neutral-900 transition-all duration-700 ease-out">
+              <img
+                  src={image.src}
+                  alt={image.name || "Object"}
+                  className="w-full h-auto cursor-pointer object-cover transition-all duration-1000 ease-out group-hover:scale-105"
+                  loading="lazy"
+                  onClick={() => setIndex(i)}
+              />
+              <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+            </div>
           </div>
         ))}
       </Masonry>
@@ -116,11 +106,11 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
       <style jsx global>{`
         .my-masonry-grid {
           display: flex;
-          margin-left: -16px; /* gutter size offset */
+          margin-left: -4px; /* gap-1 (4px) offset */
           width: auto;
         }
         .my-masonry-grid_column {
-          padding-left: 16px; /* gutter size */
+          padding-left: 4px; /* gap-1 (4px) */
           background-clip: padding-box;
         }
       `}</style>
