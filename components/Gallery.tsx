@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState } from "react";
 import Masonry from "react-masonry-css";
 import Lightbox from "yet-another-react-lightbox";
+import Download from "yet-another-react-lightbox/plugins/download";
 import "yet-another-react-lightbox/styles.css";
+
+import { getDriveImages } from "@/app/actions/google-drive";
 
 // Interface for the image data
 interface DriveImage {
@@ -17,10 +20,6 @@ interface DriveImage {
 interface GalleryProps {
   images: DriveImage[];
 }
-
-import { getDriveImages } from "@/app/actions/google-drive";
-
-// ... (previous imports)
 
 export default function Gallery({ images: initialImages }: GalleryProps) {
   const [images, setImages] = useState(initialImages); // Use local state for images
@@ -97,9 +96,10 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
         open={index >= 0}
         index={index}
         close={() => setIndex(-1)}
-        // Google CDN links (s0) generally work directly without proxy
+        plugins={[Download]}
         slides={images.map((img) => ({ 
-            src: img.originalLink || img.src 
+            src: img.originalLink || img.src,
+            downloadUrl: img.originalLink || img.src
         }))}
       />
 
