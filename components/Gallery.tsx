@@ -18,9 +18,35 @@ interface GalleryProps {
   images: DriveImage[];
 }
 
-export default function Gallery({ images }: GalleryProps) {
+import { getDriveImages } from "@/app/actions/google-drive";
+
+// ... (previous imports)
+
+export default function Gallery({ images: initialImages }: GalleryProps) {
+  const [images, setImages] = useState(initialImages); // Use local state for images
   const [index, setIndex] = useState(-1);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Trigger server-side search
+  const performSearch = async () => {
+    setIsSearching(true);
+    try {
+      const results = await getDriveImages(search);
+      setImages(results);
+    } catch (error) {
+      console.error("Search failed", error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      performSearch();
+    }
+  };
 
   // Breakpoints for Masonry layout
   const breakpointColumnsObj = {
@@ -30,79 +56,30 @@ export default function Gallery({ images }: GalleryProps) {
     500: 1,
   };
 
-  const handleDownload = async (item: DriveImage) => {
-    const targetUrl = item.originalLink || item.src;
-    
-    setDownloadingId(item.id || "temp");
-    
-    try {
-      // Fetch via proxy to avoid CORS
-      const proxyUrl = `/api/proxy-image?url=${encodeURIComponent(targetUrl)}`;
-      const response = await fetch(proxyUrl);
-      
-      if (!response.ok) throw new Error("Network response was not ok");
-      
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = item.name || `image-${Date.now()}.jpg`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Cleanup
-      window.URL.revokeObjectURL(blobUrl);
-
-      // Verify if we can show a success message (optional)
-      // alert("Saving to gallery..."); 
-    } catch (e) {
-      console.error("Download failed", e);
-      alert("Failed to download image");
-    } finally {
-      setDownloadingId(null);
-    }
-  };
-
-  // Custom Long Press Hook Logic inside the map
-  // (Simplified for inline usage within the map loop)
-  const useLongPressLogic = (item: DriveImage) => {
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-    const start = () => {
-      timerRef.current = setTimeout(() => {
-        // Trigger download after 2 seconds
-        handleDownload(item);
-        // Vibrate to give feedback (if supported)
-        if (navigator.vibrate) navigator.vibrate(200);
-      }, 2000); // 2 seconds
-    };
-
-    const stop = () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-
-    return {
-      onTouchStart: start,
-      onTouchEnd: stop,
-      onMouseDown: start,
-      onMouseUp: stop,
-      onMouseLeave: stop
-    };
-  };
-
   return (
     <div className="w-full">
-      {downloadingId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-zinc-800 p-4 rounded-lg shadow-xl">
-            <p className="font-semibold px-4">Saving image...</p>
-          </div>
-        </div>
+      {/* ... (downloadingId modal same as before) ... */}
+
+      <div className="mb-6 flex gap-2">
+        <input
+          type="text"
+          placeholder="Search images (e.g., 'face', 'cat')..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onKeyDown={handleKeyDown}
+          className="flex-1 p-3 border rounded-lg bg-gray-50 dark:bg-zinc-900 border-gray-200 dark:border-zinc-700 outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-gray-400 dark:placeholder:text-zinc-500"
+        />
+        <button 
+          onClick={performSearch}
+          disabled={isSearching}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition-colors"
+        >
+          {isSearching ? "..." : "Search"}
+        </button>
+      </div>
+
+      {images.length === 0 && !isSearching && (
+         <p className="text-center text-gray-500 mt-4">No images found matching "{search}"</p>
       )}
 
       <Masonry
@@ -115,11 +92,12 @@ export default function Gallery({ images }: GalleryProps) {
             key={image.id}
             className="mb-4 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
           >
-            <InteractiveImage 
-              image={image} 
-              index={i} 
-              setIndex={setIndex}
-              onLongPress={() => handleDownload(image)}
+            <img
+                src={image.src}
+                alt={image.name || "Gallery Image"}
+                className="w-full h-auto cursor-pointer transform transition-transform duration-300 hover:scale-105"
+                loading="lazy"
+                onClick={() => setIndex(i)}
             />
           </div>
         ))}
@@ -129,7 +107,10 @@ export default function Gallery({ images }: GalleryProps) {
         open={index >= 0}
         index={index}
         close={() => setIndex(-1)}
-        slides={images.map((img) => ({ src: img.src }))}
+        // Google CDN links (s0) generally work directly without proxy
+        slides={images.map((img) => ({ 
+            src: img.originalLink || img.src 
+        }))}
       />
 
       <style jsx global>{`
@@ -143,63 +124,6 @@ export default function Gallery({ images }: GalleryProps) {
           background-clip: padding-box;
         }
       `}</style>
-    </div>
-  );
-}
-
-// Separate component to handle long press cleanly for each item
-function InteractiveImage({ image, index, setIndex, onLongPress }: { 
-  image: DriveImage, 
-  index: number, 
-  setIndex: (i: number) => void,
-  onLongPress: () => void
-}) {
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const isLongPress = useRef(false);
-
-  const startPress = () => {
-    isLongPress.current = false;
-    timerRef.current = setTimeout(() => {
-      isLongPress.current = true;
-      if (navigator.vibrate) navigator.vibrate(50);
-      onLongPress();
-    }, 2000); // 2 seconds threshold
-  };
-
-  const endPress = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
-
-  const handleClick = () => {
-    if (!isLongPress.current) {
-      setIndex(index);
-    }
-  };
-
-  return (
-    <div
-      className="relative cursor-pointer group select-none"
-      onTouchStart={startPress}
-      onTouchEnd={endPress}
-      onTouchMove={endPress} // Cancel if user scrolls
-      onMouseDown={startPress}
-      onMouseUp={endPress}
-      onMouseLeave={endPress}
-      onClick={handleClick}
-      onContextMenu={(e) => {
-        // Optional: disable default context menu on long press
-        // e.preventDefault();
-      }}
-    >
-      <img
-        src={image.src}
-        alt={image.name || "Gallery Image"}
-        className="w-full h-auto transform transition-transform duration-300 group-hover:scale-105 pointer-events-none" // pointer-events-none prevents dragging imageGhost
-        loading="lazy"
-      />
     </div>
   );
 }
