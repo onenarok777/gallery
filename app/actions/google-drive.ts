@@ -8,7 +8,9 @@ export async function getDriveImages(searchQuery: string = "") {
 
   if (!folderId || !apiKey) {
     console.error("Missing Google Drive environment variables");
-    return [];
+    console.log("DEBUG: FOLDER_ID:", folderId, "API_KEY length:", apiKey?.length);
+    console.log("DEBUG: All Env Keys:", Object.keys(process.env).filter(k => k.startsWith("GOOGLE_")));
+    return { images: [], error: "Missing Environment Variables" };
   }
 
   try {
@@ -28,10 +30,10 @@ export async function getDriveImages(searchQuery: string = "") {
 
     const files = response.data.files;
 
-    if (!files) return [];
+    if (!files) return { images: [] };
 
     // Transform to a friendlier format if needed, or return as is
-    return files.map((file) => {
+    const images = files.map((file) => {
       const thumb = file.thumbnailLink;
       // 's1024' for preview, 's0' for high-res original
       const previewSrc = thumb ? thumb.replace(/=s\d+$/, "=s1024") : "";
@@ -50,8 +52,13 @@ export async function getDriveImages(searchQuery: string = "") {
         mimeType: file.mimeType,
       };
     });
-  } catch (error) {
+    
+    return { images };
+
+  } catch (error: any) {
     console.error("Error fetching images from Drive:", error);
-    return [];
+    // Extract more specific error message from Google API error if possible
+    const errorMessage = error.response?.data?.error?.message || error.message || "Unknown error occurred";
+    return { images: [], error: errorMessage };
   }
 }
