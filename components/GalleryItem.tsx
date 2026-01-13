@@ -59,6 +59,7 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
           }`}
           onLoad={() => setIsLoaded(true)}
           onClick={() => onClick(index)}
+          onError={() => setIsLoaded(true)} // Just hide loader on error, don't fallback
           loading="lazy"
           style={{ display: "block" }} 
         />
