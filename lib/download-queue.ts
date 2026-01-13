@@ -10,8 +10,8 @@ type DownloadTask = {
 class DownloadQueue {
   private queue: DownloadTask[] = [];
   private activeCount = 0;
-  private maxConcurrent = 1; // Strict sequential loading to avoid 429
-  private processingDelay = 500; // ms delay between requests
+  private maxConcurrent = 3; // Increased from 1 for better speed
+  private processingDelay = 50; // Reduced from 500ms for responsiveness
 
   enqueue(
     id: string,
