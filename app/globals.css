@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  /* Light mode defaults (Opposite of current dark theme) */
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+[data-theme="dark"] {
+  /* Dark mode (Current look) */
   --background: #000000;
   --foreground: #ffffff;
 }
@@ -12,15 +19,15 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-} */
-
 body {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }

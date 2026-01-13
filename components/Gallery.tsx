@@ -7,6 +7,7 @@ import Download from "yet-another-react-lightbox/plugins/download";
 import "yet-another-react-lightbox/styles.css";
 
 import { getDriveImages } from "@/app/actions/google-drive";
+import GalleryItem from "./GalleryItem";
 
 // Interface for the image data
 interface DriveImage {
@@ -15,6 +16,8 @@ interface DriveImage {
   src: string;
   originalLink: string | null | undefined;
   mimeType: string | null | undefined;
+  width?: number | null;
+  height?: number | null;
 }
 
 interface GalleryProps {
@@ -47,31 +50,7 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
     }
   };
 
-  // Real-time polling
-  useEffect(() => {
-    // Only poll if not searching
-    if (search) return;
 
-    const intervalId = setInterval(async () => {
-      try {
-        const { images: newImages } = await getDriveImages();
-        if (newImages && newImages.length > 0) {
-           // Simple check to avoid re-renders if data matches strictly
-           // (This is a basic check; deep compare or timestamp check would be better but this suffices for now)
-           setImages(current => {
-             if (current.length === newImages.length && current[0]?.id === newImages[0]?.id) {
-               return current;
-             }
-             return newImages;
-           });
-        }
-      } catch (error) {
-        console.error("Polling failed", error);
-      }
-    }, 10000); // 10 seconds
-
-    return () => clearInterval(intervalId);
-  }, [search]);
 
   // Breakpoints for Masonry layout
   const breakpointColumnsObj = {
@@ -86,10 +65,10 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
       className="w-full max-w-[1800px] mx-auto px-4 md:px-8 py-20"
     >
       <header className="mb-16 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-white mb-2 tracking-wide">
+        <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-2 tracking-wide transition-colors">
           My Gallery
         </h1>
-        <p className="text-neutral-400 text-sm md:text-base tracking-wider">
+        <p className="text-neutral-500 dark:text-neutral-400 text-sm md:text-base tracking-wider transition-colors">
           Collection from Google Drive
         </p>
       </header>
@@ -100,27 +79,12 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
         columnClassName="my-masonry-grid_column"
       >
         {images.map((image, i) => (
-          <div
-            key={image.id}
-            className="mb-4 group"
-          >
-            <div className="relative overflow-hidden rounded-xl bg-neutral-900 transition-all duration-500 ease-out">
-              <img
-                  src={image.originalLink || image.src}
-                  alt={image.name || "Gallery Image"}
-                  className="w-full h-auto cursor-pointer object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
-                  loading="lazy"
-                  onClick={() => setIndex(i)}
-                  style={{ display: "block" }}
-              />
-              <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-              
-              {/* Optional: Add watermark/text overlay if desired, based on screenshot "got tries." */}
-              <div className="absolute bottom-3 left-3 opacity-80 pointer-events-none">
-                 <p className="text-[10px] text-white/70 font-light tracking-widest uppercase">got tries.</p>
-              </div>
-            </div>
-          </div>
+          <GalleryItem 
+            key={image.id} 
+            image={image} 
+            index={i} 
+            onClick={setIndex} 
+          />
         ))}
       </Masonry>
 

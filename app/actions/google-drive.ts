@@ -24,7 +24,8 @@ export async function getDriveImages(searchQuery: string = "") {
 
     const response = await drive.files.list({
       q,
-      fields: "files(id, name, thumbnailLink, webContentLink, mimeType)",
+      fields: "files(id, name, thumbnailLink, webContentLink, mimeType, imageMediaMetadata)",
+      orderBy: "modifiedTime", // Ascending (Oldest to Newest) to match User's Drive setting
       pageSize: 100, // Adjust as needed
     });
 
@@ -37,12 +38,14 @@ export async function getDriveImages(searchQuery: string = "") {
       const thumb = file.thumbnailLink;
       // 's1024' for preview, 's0' for high-res original
       const previewSrc = thumb ? thumb.replace(/=s\d+$/, "=s1024") : "";
+      
+      // User explicitly requested STRICT ORIGINAL ONLY (s0)
+      // Note: 's0' triggers stricter rate limits from Google Drive than 's16383'
       const originalSrc = thumb ? thumb.replace(/=s\d+$/, "=s0") : file.webContentLink;
 
       // Fallback: If no thumbnail provided by API, try explicit thumbnail endpoint via proxy
-      // This handles cases where Drive API doesn't return thumbnailLink but the file is an image
-      const fallbackUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1024`;
-      const finalSrc = previewSrc || `/api/proxy-image?url=${encodeURIComponent(fallbackUrl)}`;
+      const fallbackUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=s0`; // Request s0 explicitly
+      const finalSrc = originalSrc || `/api/proxy-image?url=${encodeURIComponent(fallbackUrl)}`;
 
       return {
         id: file.id,
@@ -50,6 +53,8 @@ export async function getDriveImages(searchQuery: string = "") {
         src: finalSrc,
         originalLink: originalSrc, // Client will try direct load, or we can use proxy logic there too if needed
         mimeType: file.mimeType,
+        width: file.imageMediaMetadata?.width,
+        height: file.imageMediaMetadata?.height,
       };
     });
     
