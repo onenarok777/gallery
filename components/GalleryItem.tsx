@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { downloadQueue } from "@/lib/download-queue";
+import { useState } from "react";
 
 interface DriveImage {
   id: string | null | undefined;
@@ -21,60 +20,8 @@ interface GalleryItemProps {
 
 export default function GalleryItem({ image, index, onClick }: GalleryItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [objectUrl, setObjectUrl] = useState<string | null>(null);
-  const [isInView, setIsInView] = useState(false);
-  const containerRef = useState<HTMLDivElement | null>(null); // Ref type for callback
-
-  // Simple intersection observer to trigger load
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setIsInView(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { rootMargin: "200px" } // Trigger slightly before view
-    );
-
-    const currentRef = document.getElementById(`gallery-item-${image.id}`);
-    if (currentRef) {
-      observer.observe(currentRef);
-    }
-
-    return () => observer.disconnect();
-  }, [image.id]);
-
-  useEffect(() => {
-    if (!isInView || objectUrl) return;
-
-    const src = image.originalLink || image.src;
-    
-    // Use the download queue singleton
-    const cancel = downloadQueue.enqueue(
-      image.id || src,
-      src,
-      (percent) => setProgress(percent),
-      (blob) => {
-        const url = URL.createObjectURL(blob);
-        setObjectUrl(url);
-        setIsLoaded(true);
-      },
-      (error) => {
-        console.error(`Download failed for ${image.id}:`, error);
-        // Fallback to src
-        setObjectUrl(src);
-        setIsLoaded(true);
-      }
-    );
-
-    return () => {
-      cancel();
-    };
-  }, [isInView, image.id, image.originalLink, image.src, objectUrl]);
+  // We use the direct src which is now ORIGINAL (s0)
+  const src = image.src; 
 
   return (
     <div
@@ -84,7 +31,7 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
     >
       <div className="relative w-full h-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300">
         
-        {/* Loading State */}
+        {/* Loading State Overlay */}
         {!isLoaded && (
           <div className="absolute inset-0 z-10 bg-neutral-100 dark:bg-neutral-800 flex flex-col items-center justify-center">
              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/5 -translate-x-full animate-[shimmer_1.5s_infinite] pointer-events-none" />
@@ -103,22 +50,20 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
           </div>
         )}
 
-        {/* Image Display */}
-        {objectUrl && (
-          <img
-            src={objectUrl}
-            alt={image.name || "Gallery Image"}
-            className={`w-full h-full cursor-pointer object-cover transition-all duration-700 ease-in-out group-hover:scale-105 ${
-              isLoaded ? "opacity-100" : "opacity-0"
-            }`}
-            onClick={() => onClick(index)}
-            style={{ display: "block" }}
-          />
-        )}
+        {/* Native Image Display - Browser handles queueing and caching much better for thumbnails */}
+        <img
+          src={src}
+          alt={image.name || "Gallery Image"}
+          className={`w-full h-full cursor-pointer object-cover transition-all duration-700 ease-in-out group-hover:scale-105 ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          onLoad={() => setIsLoaded(true)}
+          onClick={() => onClick(index)}
+          loading="lazy"
+          style={{ display: "block" }} 
+        />
         
         <div className="absolute inset-0 bg-black/5 dark:bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"></div>
-
-
       </div>
     </div>
   );

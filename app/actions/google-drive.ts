@@ -36,15 +36,16 @@ export async function getDriveImages(searchQuery: string = "") {
     // Transform to a friendlier format if needed, or return as is
     const images = files.map((file) => {
       const thumb = file.thumbnailLink;
-      // 's1024' for preview, 's0' for high-res original
+      // 's1024' for preview (Fast, Good Quality, No 429)
       const previewSrc = thumb ? thumb.replace(/=s\d+$/, "=s1024") : "";
       
-      // User explicitly requested STRICT ORIGINAL ONLY (s0)
-      // Note: 's0' triggers stricter rate limits from Google Drive than 's16383'
+      // 's0' for Original (Huge, Slow, Rate Limited)
       const originalSrc = thumb ? thumb.replace(/=s\d+$/, "=s0") : file.webContentLink;
 
-      // Fallback: If no thumbnail provided by API, try explicit thumbnail endpoint via proxy
-      const fallbackUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=s0`; // Request s0 explicitly
+      // Fallback
+      const fallbackUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=s0`;
+      
+      // GRID uses ORIGINAL (s0) as requested - Native Browser Loading should handle queuing
       const finalSrc = originalSrc || `/api/proxy-image?url=${encodeURIComponent(fallbackUrl)}`;
 
       return {

@@ -19,7 +19,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Luxe Gallery",
+  title: "My Gallery",
   description: "A premium collection from Google Drive",
 };
 
