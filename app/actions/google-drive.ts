@@ -2,7 +2,7 @@
 
 import { getAuthenticatedDrive } from "@/lib/google-auth";
 
-export async function getDriveImages(searchQuery: string = "") {
+export async function getDriveImages(searchQuery: string = "", pageToken?: string) {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
   if (!folderId) {
@@ -18,18 +18,21 @@ export async function getDriveImages(searchQuery: string = "") {
       q += ` and (name contains '${searchQuery}' or fullText contains '${searchQuery}')`;
     }
 
-    const response = await drive.files.list({
+    const response: any = await drive.files.list({
       q,
-      fields: "files(id, name, mimeType, imageMediaMetadata, thumbnailLink)",
-      orderBy: "modifiedTime",
-      pageSize: 100,
+      fields: "nextPageToken, files(id, name, mimeType, imageMediaMetadata, thumbnailLink)",
+      orderBy: "modifiedTime desc", // Newest first
+      pageSize: 50, // Load 50 at a time for infinite scroll
+      pageToken: pageToken,
     });
 
     const files = response.data.files;
-    if (!files) return { images: [] };
+    const nextPageToken = response.data.nextPageToken;
+
+    if (!files) return { images: [], nextPageToken: undefined };
 
     // Use original images for everything (cached on Vercel Edge CDN)
-    const images = files.map((file) => {
+    const images = files.map((file: any) => {
       const imageSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
       
       return {
@@ -43,10 +46,64 @@ export async function getDriveImages(searchQuery: string = "") {
       };
     });
     
-    return { images };
+    return { images, nextPageToken };
 
   } catch (error: any) {
     console.error("Error fetching images from Drive:", error?.message || error);
     return { images: [], error: error?.message || "Unknown error" };
+  }
+}
+
+// Simple in-memory cache for total count
+let cachedTotalCount: number | null = null;
+let lastCountTime = 0;
+const COUNT_CACHE_TTL = 3600 * 1000; // 1 hour
+
+export async function getTotalImageCount(searchQuery: string = "") {
+  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+
+  if (!folderId) return 0;
+
+  // Use cache if available and fresh, and no search query (search needs real count)
+  if (!searchQuery && cachedTotalCount !== null && (Date.now() - lastCountTime < COUNT_CACHE_TTL)) {
+    return cachedTotalCount;
+  }
+
+  try {
+    const drive = getAuthenticatedDrive();
+    let q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
+    
+    if (searchQuery) {
+       q += ` and (name contains '${searchQuery}' or fullText contains '${searchQuery}')`;
+    }
+
+    let total = 0;
+    let pageToken: string | undefined = undefined;
+
+    do {
+      const response: any = await drive.files.list({
+        q,
+        fields: "nextPageToken, files(id)", // Only fetch IDs for speed
+        pageSize: 1000, // Max page size for faster counting
+        pageToken: pageToken,
+      });
+
+      const files = response.data.files;
+      if (files) {
+        total += files.length;
+      }
+      pageToken = response.data.nextPageToken;
+    } while (pageToken);
+
+    // Update cache only if no search query
+    if (!searchQuery) {
+      cachedTotalCount = total;
+      lastCountTime = Date.now();
+    }
+
+    return total;
+  } catch (error) {
+    console.error("Error counting images:", error);
+    return 0;
   }
 }

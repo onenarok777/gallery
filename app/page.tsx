@@ -1,11 +1,16 @@
-import { getDriveImages } from "./actions/google-drive";
+import { getDriveImages, getTotalImageCount } from "./actions/google-drive";
 import Gallery from "@/components/Gallery";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const revalidate = 60; // Revalidate every 60 seconds
 
 export default async function Home() {
-  const { images, error } = await getDriveImages();
+  const [data, totalCount] = await Promise.all([
+    getDriveImages(),
+    getTotalImageCount()
+  ]);
+  
+  const { images, error, nextPageToken } = data;
 
   return (
     <main className="min-h-screen bg-background transition-colors duration-300">
@@ -32,7 +37,11 @@ export default async function Home() {
 
         </div>
       ) : (
-        <Gallery images={images} />
+        <Gallery 
+          initialImages={images} 
+          initialNextPageToken={nextPageToken} 
+          initialTotalCount={totalCount}
+        />
       )}
     </main>
   );
