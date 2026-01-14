@@ -28,20 +28,15 @@ export async function getDriveImages(searchQuery: string = "") {
     const files = response.data.files;
     if (!files) return { images: [] };
 
-    // Use proxy with caching for thumbnails to avoid Google rate limits
+    // Use original images for everything (cached on Vercel Edge CDN)
     const images = files.map((file) => {
-      // Encode thumbnailLink and pass it to proxy - avoids extra API call!
-      const thumbUrl = file.thumbnailLink 
-        ? file.thumbnailLink.replace(/=s\d+/, "=s600") 
-        : "";
-      const previewSrc = `/api/drive-image/${file.id}?thumb=1&url=${encodeURIComponent(thumbUrl)}`;
-      const originalSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
+      const imageSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
       
       return {
         id: file.id,
         name: file.name,
-        src: previewSrc,           // Grid uses proxy (with server cache)
-        originalSrc: originalSrc,  // Lightbox uses proxy for original
+        src: imageSrc,             // Grid uses original
+        originalSrc: imageSrc,     // Lightbox uses original
         mimeType: file.mimeType,
         width: file.imageMediaMetadata?.width,
         height: file.imageMediaMetadata?.height,
