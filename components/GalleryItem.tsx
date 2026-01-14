@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface DriveImage {
   id: string | null | undefined;
@@ -20,19 +20,64 @@ interface GalleryItemProps {
 
 export default function GalleryItem({ image, index, onClick }: GalleryItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  // We use the direct src which is now ORIGINAL (s0)
+  const [hasError, setHasError] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
   const src = image.src; 
+  
+  // Get file extension from name
+  const fileExt = image.name?.split('.').pop()?.toUpperCase() || "Unknown";
+
+  // Check if image is already loaded (from cache) or complete
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete) {
+      if (img.naturalHeight > 0) {
+        setIsLoaded(true);
+      } else {
+        // Image loaded but has no dimensions = unsupported format
+        setHasError(true);
+        setIsLoaded(true);
+      }
+    }
+    
+    // Fallback: check again after a delay for unsupported formats
+    const timeout = setTimeout(() => {
+      const img = imgRef.current;
+      if (img && img.complete && img.naturalHeight === 0) {
+        setHasError(true);
+        setIsLoaded(true);
+      } else if (!isLoaded) {
+        setIsLoaded(true);
+      }
+    }, 5000);
+    
+    return () => clearTimeout(timeout);
+  }, [src, isLoaded]);
+
+  const handleLoad = () => {
+    const img = imgRef.current;
+    if (img && img.naturalHeight === 0) {
+      // Loaded but no dimensions = unsupported
+      setHasError(true);
+    }
+    setIsLoaded(true);
+  };
+
+  const handleError = () => {
+    setHasError(true);
+    setIsLoaded(true);
+  };
 
   return (
     <div
       id={`gallery-item-${image.id}`}
       className="mb-4 group"
-      style={{ aspectRatio: image.width && image.height ? `${image.width}/${image.height}` : 'auto' }}
+      style={{ aspectRatio: image.width && image.height ? `${image.width}/${image.height}` : '4/3' }}
     >
       <div className="relative w-full h-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300">
         
         {/* Loading State Overlay */}
-        {!isLoaded && (
+        {!isLoaded && !hasError && (
           <div className="absolute inset-0 z-10 bg-neutral-100 dark:bg-neutral-800 flex flex-col items-center justify-center">
              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/5 -translate-x-full animate-[shimmer_1.5s_infinite] pointer-events-none" />
              
@@ -50,21 +95,43 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
           </div>
         )}
 
-        {/* Native Image Display - Browser handles queueing and caching much better for thumbnails */}
+        {/* Unsupported Format Overlay */}
+        {hasError && (
+          <div 
+            className="absolute inset-0 z-10 bg-neutral-200 dark:bg-neutral-800 flex flex-col items-center justify-center"
+          >
+             <svg 
+               className="w-10 h-10 text-neutral-400 dark:text-neutral-600" 
+               fill="none" 
+               viewBox="0 0 24 24" 
+               stroke="currentColor"
+             >
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+             </svg>
+             <span className="mt-2 text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+               ไม่รองรับ {fileExt}
+             </span>
+          </div>
+        )}
+
+        {/* Native Image Display */}
         <img
+          ref={imgRef}
           src={src}
           alt={image.name || "Gallery Image"}
           className={`w-full h-full cursor-pointer object-cover transition-all duration-700 ease-in-out group-hover:scale-105 ${
-            isLoaded ? "opacity-100" : "opacity-0"
+            isLoaded && !hasError ? "opacity-100" : "opacity-0"
           }`}
-          onLoad={() => setIsLoaded(true)}
+          onLoad={handleLoad}
           onClick={() => onClick(index)}
-          onError={() => setIsLoaded(true)} // Just hide loader on error, don't fallback
+          onError={handleError}
           loading="lazy"
           style={{ display: "block" }} 
         />
         
-        <div className="absolute inset-0 bg-black/5 dark:bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"></div>
+        {!hasError && (
+          <div className="absolute inset-0 bg-black/5 dark:bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-20"></div>
+        )}
       </div>
     </div>
   );

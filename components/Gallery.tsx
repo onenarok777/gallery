@@ -1,10 +1,19 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import Masonry from "react-masonry-css";
-import Lightbox from "yet-another-react-lightbox";
-import Download from "yet-another-react-lightbox/plugins/download";
-import "yet-another-react-lightbox/styles.css";
+import LightGallery from "lightgallery/react";
+import lgZoom from "lightgallery/plugins/zoom";
+import lgRotate from "lightgallery/plugins/rotate";
+import lgFullscreen from "lightgallery/plugins/fullscreen";
+import lgThumbnail from "lightgallery/plugins/thumbnail";
+
+// Styles
+import "lightgallery/css/lightgallery.css";
+import "lightgallery/css/lg-zoom.css";
+import "lightgallery/css/lg-rotate.css";
+import "lightgallery/css/lg-fullscreen.css";
+import "lightgallery/css/lg-thumbnail.css";
 
 import { getDriveImages } from "@/app/actions/google-drive";
 import GalleryItem from "./GalleryItem";
@@ -25,11 +34,10 @@ interface GalleryProps {
 }
 
 export default function Gallery({ images: initialImages }: GalleryProps) {
-  const [images, setImages] = useState(initialImages); // Use local state for images
-  const [index, setIndex] = useState(-1);
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [images, setImages] = useState(initialImages);
   const [search, setSearch] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const lightGalleryRef = useRef<any>(null);
 
   // Trigger server-side search
   const performSearch = async () => {
@@ -50,20 +58,23 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
     }
   };
 
-
+  // Open lightGallery at specific index
+  const openLightbox = useCallback((index: number) => {
+    if (lightGalleryRef.current) {
+      lightGalleryRef.current.openGallery(index);
+    }
+  }, []);
 
   // Breakpoints for Masonry layout
   const breakpointColumnsObj = {
     default: 4,
     1280: 3,
-    768: 2, // Tablet
-    500: 2, // Mobile strictly 2 columns
+    768: 2,
+    500: 2,
   };
 
   return (
-    <div 
-      className="w-full max-w-[1800px] mx-auto px-4 md:px-8 py-20"
-    >
+    <div className="w-full max-w-[1800px] mx-auto px-4 md:px-8 py-20">
       <header className="mb-16 text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-2 tracking-wide transition-colors">
           My Gallery
@@ -72,6 +83,27 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
           Collection from Google Drive
         </p>
       </header>
+
+      {/* Hidden LightGallery - triggered programmatically */}
+      <LightGallery
+        onInit={(detail) => {
+          lightGalleryRef.current = detail.instance;
+        }}
+        plugins={[lgZoom, lgRotate, lgFullscreen, lgThumbnail]}
+        speed={500}
+        download={true}
+        rotateLeft={true}
+        rotateRight={true}
+        flipHorizontal={true}
+        flipVertical={true}
+        dynamic={true}
+        dynamicEl={images.map((img) => ({
+          src: img.src,
+          thumb: img.src,
+          downloadUrl: img.src,
+          subHtml: `<h4>${img.name || "Image"}</h4>`,
+        }))}
+      />
 
       <Masonry
         breakpointCols={breakpointColumnsObj}
@@ -83,49 +115,39 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
             key={image.id} 
             image={image} 
             index={i} 
-            onClick={setIndex} 
+            onClick={openLightbox} 
           />
         ))}
       </Masonry>
 
-      <Lightbox
-        open={index >= 0}
-        index={index}
-        close={() => setIndex(-1)}
-        plugins={[Download]}
-        slides={images.map((img) => ({ 
-            src: img.originalSrc || img.src,
-            downloadUrl: img.originalSrc || img.src
-        }))}
-        render={{
-          slide: ({ slide }) => (
-            <img
-              src={slide.src}
-              alt=""
-              style={{
-                maxWidth: '100%',
-                maxHeight: '100%',
-                objectFit: 'contain',
-                WebkitTouchCallout: 'default',
-                WebkitUserSelect: 'auto',
-                userSelect: 'auto',
-              }}
-              draggable={false}
-            />
-          )
-        }}
-      />
-
-
       <style jsx global>{`
         .my-masonry-grid {
           display: flex;
-          margin-left: -16px; /* gap-4 (16px) offset */
+          margin-left: -16px;
           width: auto;
         }
         .my-masonry-grid_column {
-          padding-left: 16px; /* gap-4 (16px) */
+          padding-left: 16px;
           background-clip: padding-box;
+        }
+        
+        /* Custom lightGallery styles */
+        .lg-backdrop {
+          background-color: rgba(0, 0, 0, 0.95);
+        }
+        .lg-toolbar {
+          background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+        }
+        .lg-outer .lg-thumb-outer {
+          background-color: rgba(0, 0, 0, 0.8);
+        }
+        .lg-outer .lg-thumb-item {
+          border-radius: 4px;
+          border: 2px solid transparent;
+        }
+        .lg-outer .lg-thumb-item.active,
+        .lg-outer .lg-thumb-item:hover {
+          border-color: #fff;
         }
       `}</style>
     </div>
