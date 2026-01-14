@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedDrive } from "@/lib/google-auth";
 
 // In-memory cache for images (cleared on server restart or by webhook)
-const imageCache = new Map<string, { data: Buffer; contentType: string; timestamp: number }>();
+const imageCache = new Map<string, { data: Uint8Array; contentType: string; timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hour cache
 const MAX_CACHE_SIZE = 200; // Max cached items
 
@@ -30,7 +30,7 @@ export async function GET(
       headers.set("X-Cache", "HIT");
       // Aggressive caching for Vercel Edge CDN (24 hours)
       headers.set("Cache-Control", "public, s-maxage=86400, stale-while-revalidate=86400, max-age=31536000, immutable");
-      return new NextResponse(cached.data, { headers });
+      return new NextResponse(cached.data.buffer.slice(cached.data.byteOffset, cached.data.byteOffset + cached.data.byteLength) as ArrayBuffer, { headers });
     }
 
     // Fetch original file from Google Drive
@@ -39,12 +39,12 @@ export async function GET(
       { responseType: "arraybuffer" }
     );
 
-    const imageBuffer = Buffer.from(response.data as ArrayBuffer);
+    const imageData = new Uint8Array(response.data as ArrayBuffer);
     const contentType = (response.headers["content-type"] || "image/jpeg").toString();
 
     // Set response headers
     headers.set("Content-Type", contentType);
-    headers.set("Content-Length", imageBuffer.byteLength.toString());
+    headers.set("Content-Length", imageData.byteLength.toString());
     headers.set("X-Cache", "MISS");
     
     // Aggressive caching for Vercel Edge CDN (24 hours)
@@ -63,9 +63,9 @@ export async function GET(
         imageCache.delete(entries[i][0]);
       }
     }
-    imageCache.set(cacheKey, { data: imageBuffer, contentType, timestamp: Date.now() });
+    imageCache.set(cacheKey, { data: imageData, contentType, timestamp: Date.now() });
 
-    return new NextResponse(imageBuffer, { headers });
+    return new NextResponse(imageData.buffer.slice(imageData.byteOffset, imageData.byteOffset + imageData.byteLength) as ArrayBuffer, { headers });
 
   } catch (error: any) {
     console.error("Error serving Drive image:", error?.message || error);
