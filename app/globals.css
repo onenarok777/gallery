@@ -31,3 +31,11 @@ body {
     transform: translateX(100%);
   }
 }
+
+/* Enable long-press save on mobile for Lightbox images */
+.yarl__slide_image {
+  -webkit-touch-callout: default !important;
+  -webkit-user-select: auto !important;
+  user-select: auto !important;
+  pointer-events: auto !important;
+}

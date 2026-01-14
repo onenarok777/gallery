@@ -97,6 +97,23 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
             src: img.originalSrc || img.src,
             downloadUrl: img.originalSrc || img.src
         }))}
+        render={{
+          slide: ({ slide }) => (
+            <img
+              src={slide.src}
+              alt=""
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+                objectFit: 'contain',
+                WebkitTouchCallout: 'default',
+                WebkitUserSelect: 'auto',
+                userSelect: 'auto',
+              }}
+              draggable={false}
+            />
+          )
+        }}
       />
 
 
