@@ -20,7 +20,7 @@ export async function getDriveImages(searchQuery: string = "") {
 
     const response = await drive.files.list({
       q,
-      fields: "files(id, name, mimeType, imageMediaMetadata)",
+      fields: "files(id, name, mimeType, imageMediaMetadata, thumbnailLink)",
       orderBy: "modifiedTime",
       pageSize: 100,
     });
@@ -28,16 +28,20 @@ export async function getDriveImages(searchQuery: string = "") {
     const files = response.data.files;
     if (!files) return { images: [] };
 
-    // Use our proxy endpoint for all images
+    // Use proxy with caching for thumbnails to avoid Google rate limits
     const images = files.map((file) => {
-      const previewSrc = `/api/drive-image/${file.id}?thumb=1`;
+      // Encode thumbnailLink and pass it to proxy - avoids extra API call!
+      const thumbUrl = file.thumbnailLink 
+        ? file.thumbnailLink.replace(/=s\d+/, "=s600") 
+        : "";
+      const previewSrc = `/api/drive-image/${file.id}?thumb=1&url=${encodeURIComponent(thumbUrl)}`;
       const originalSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
       
       return {
         id: file.id,
         name: file.name,
-        src: previewSrc,           // Grid uses preview (thumbnail)
-        originalSrc: originalSrc,  // Lightbox uses original
+        src: previewSrc,           // Grid uses proxy (with server cache)
+        originalSrc: originalSrc,  // Lightbox uses proxy for original
         mimeType: file.mimeType,
         width: file.imageMediaMetadata?.width,
         height: file.imageMediaMetadata?.height,

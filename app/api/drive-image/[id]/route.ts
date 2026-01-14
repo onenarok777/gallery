@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthenticatedDrive } from "@/lib/google-auth";
 import { Readable } from "stream";
 
+// In-memory cache for thumbnails (cleared on server restart)
+const thumbnailCache = new Map<string, { data: ArrayBuffer; contentType: string; timestamp: number }>();
+const CACHE_TTL = 1000 * 60 * 60; // 1 hour cache
+const MAX_CACHE_SIZE = 500; // Max cached items
+
 // Convert Node.js Readable to Web ReadableStream
 async function* nodeStreamToIterator(stream: Readable) {
   for await (const chunk of stream) {
@@ -41,30 +46,56 @@ export async function GET(
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
 
     if (isThumbnail) {
-      // Get file metadata with thumbnailLink
-      const fileInfo = await drive.files.get({
-        fileId: id,
-        fields: "thumbnailLink"
-      });
+      const cacheKey = `thumb_${id}`;
       
-      const thumbnailUrl = fileInfo.data.thumbnailLink;
+      // Check in-memory cache first
+      const cached = thumbnailCache.get(cacheKey);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        headers.set("Content-Type", cached.contentType);
+        headers.set("X-Cache", "HIT");
+        return new NextResponse(cached.data, { headers });
+      }
+
+      // Get thumbnailLink from query parameter (passed from getDriveImages)
+      // This avoids an extra API call to drive.files.get!
+      let thumbnailUrl = request.nextUrl.searchParams.get("url");
+      
+      // Fallback: if no URL provided, fetch from API (slower)
+      if (!thumbnailUrl) {
+        const fileInfo = await drive.files.get({
+          fileId: id,
+          fields: "thumbnailLink"
+        });
+        thumbnailUrl = fileInfo.data.thumbnailLink?.replace(/=s\d+/, "=s600") || null;
+      }
+      
       if (!thumbnailUrl) {
         return new NextResponse("Thumbnail not available", { status: 404 });
       }
       
-      // Replace thumbnail size for larger preview (600px)
-      const largerThumbUrl = thumbnailUrl.replace(/=s\d+/, "=s600");
-      
       // Fetch thumbnail from Google
-      const thumbResponse = await fetch(largerThumbUrl);
+      const thumbResponse = await fetch(thumbnailUrl);
       if (!thumbResponse.ok) {
         return new NextResponse("Failed to fetch thumbnail", { status: 502 });
       }
       
       const contentType = thumbResponse.headers.get("content-type") || "image/jpeg";
       headers.set("Content-Type", contentType);
+      headers.set("X-Cache", "MISS");
       
       const arrayBuffer = await thumbResponse.arrayBuffer();
+      
+      // Store in cache (with size limit)
+      if (thumbnailCache.size >= MAX_CACHE_SIZE) {
+        // Remove oldest entries
+        const entries = Array.from(thumbnailCache.entries());
+        entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+        for (let i = 0; i < 50; i++) { // Remove oldest 50
+          thumbnailCache.delete(entries[i][0]);
+        }
+      }
+      thumbnailCache.set(cacheKey, { data: arrayBuffer, contentType, timestamp: Date.now() });
+      
       return new NextResponse(arrayBuffer, { headers });
       
     } else {
