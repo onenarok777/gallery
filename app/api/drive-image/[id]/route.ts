@@ -27,6 +27,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const isThumbnail = request.nextUrl.searchParams.get("thumb") === "1";
 
   if (!id) {
     return new NextResponse("Missing File ID", { status: 400 });
@@ -34,36 +35,64 @@ export async function GET(
 
   try {
     const drive = getAuthenticatedDrive();
-
-    // Stream file content directly
-    const response = await drive.files.get(
-      { fileId: id, alt: "media" },
-      { responseType: "stream" }
-    );
-
     const headers = new Headers();
-    
-    // Set content type from Google response
-    const contentType = response.headers["content-type"] || "application/octet-stream";
-    headers.set("Content-Type", contentType.toString());
-    
-    // Set content length if available
-    const contentLength = response.headers["content-length"];
-    if (contentLength) {
-      headers.set("Content-Length", contentLength.toString());
-    }
-    
-    // Set filename for "Save As" dialog
-    const name = request.nextUrl.searchParams.get("name") || "image.jpg";
-    headers.set("Content-Disposition", `inline; filename="${encodeURIComponent(name)}"`);
     
     // Aggressive caching (1 year)
     headers.set("Cache-Control", "public, max-age=31536000, immutable");
 
-    // Stream the response
-    const stream = iteratorToStream(nodeStreamToIterator(response.data as Readable));
+    if (isThumbnail) {
+      // Get file metadata with thumbnailLink
+      const fileInfo = await drive.files.get({
+        fileId: id,
+        fields: "thumbnailLink"
+      });
+      
+      const thumbnailUrl = fileInfo.data.thumbnailLink;
+      if (!thumbnailUrl) {
+        return new NextResponse("Thumbnail not available", { status: 404 });
+      }
+      
+      // Replace thumbnail size for larger preview (600px)
+      const largerThumbUrl = thumbnailUrl.replace(/=s\d+/, "=s600");
+      
+      // Fetch thumbnail from Google
+      const thumbResponse = await fetch(largerThumbUrl);
+      if (!thumbResponse.ok) {
+        return new NextResponse("Failed to fetch thumbnail", { status: 502 });
+      }
+      
+      const contentType = thumbResponse.headers.get("content-type") || "image/jpeg";
+      headers.set("Content-Type", contentType);
+      
+      const arrayBuffer = await thumbResponse.arrayBuffer();
+      return new NextResponse(arrayBuffer, { headers });
+      
+    } else {
+      // Stream original file content
+      const response = await drive.files.get(
+        { fileId: id, alt: "media" },
+        { responseType: "stream" }
+      );
 
-    return new NextResponse(stream, { headers });
+      // Set content type from Google response
+      const contentType = response.headers["content-type"] || "application/octet-stream";
+      headers.set("Content-Type", contentType.toString());
+      
+      // Set content length if available
+      const contentLength = response.headers["content-length"];
+      if (contentLength) {
+        headers.set("Content-Length", contentLength.toString());
+      }
+      
+      // Set filename for "Save As" dialog
+      const name = request.nextUrl.searchParams.get("name") || "image.jpg";
+      headers.set("Content-Disposition", `inline; filename="${encodeURIComponent(name)}"`);
+
+      // Stream the response
+      const stream = iteratorToStream(nodeStreamToIterator(response.data as Readable));
+
+      return new NextResponse(stream, { headers });
+    }
 
   } catch (error: any) {
     console.error("Error serving Drive image:", error?.message || error);

@@ -6,7 +6,7 @@ interface DriveImage {
   id: string | null | undefined;
   name: string | null | undefined;
   src: string;
-  originalLink: string | null | undefined;
+  originalSrc?: string;
   mimeType: string | null | undefined;
   width?: number | null;
   height?: number | null;

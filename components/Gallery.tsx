@@ -14,7 +14,7 @@ interface DriveImage {
   id: string | null | undefined;
   name: string | null | undefined;
   src: string;
-  originalLink: string | null | undefined;
+  originalSrc?: string;
   mimeType: string | null | undefined;
   width?: number | null;
   height?: number | null;
@@ -94,10 +94,11 @@ export default function Gallery({ images: initialImages }: GalleryProps) {
         close={() => setIndex(-1)}
         plugins={[Download]}
         slides={images.map((img) => ({ 
-            src: img.originalLink || img.src,
-            downloadUrl: img.originalLink || img.src
+            src: img.originalSrc || img.src,
+            downloadUrl: img.originalSrc || img.src
         }))}
       />
+
 
       <style jsx global>{`
         .my-masonry-grid {

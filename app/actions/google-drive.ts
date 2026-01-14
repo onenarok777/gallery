@@ -30,13 +30,14 @@ export async function getDriveImages(searchQuery: string = "") {
 
     // Use our proxy endpoint for all images
     const images = files.map((file) => {
-      const proxySrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
+      const previewSrc = `/api/drive-image/${file.id}?thumb=1`;
+      const originalSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
       
       return {
         id: file.id,
         name: file.name,
-        src: proxySrc,
-        originalLink: proxySrc,
+        src: previewSrc,           // Grid uses preview (thumbnail)
+        originalSrc: originalSrc,  // Lightbox uses original
         mimeType: file.mimeType,
         width: file.imageMediaMetadata?.width,
         height: file.imageMediaMetadata?.height,
