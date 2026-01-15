@@ -12,6 +12,21 @@ export default async function Home() {
   
   const { images, error, nextPageToken } = data;
 
+  // Fire-and-forget webhook renewal check (Lazy Initialization)
+  // This ensures that even if the cron job fails or hasn't run, the first user to visit
+  // will re-activate the real-time updates.
+  try {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL;
+    if (siteUrl && process.env.REVALIDATE_SECRET) {
+      // We don't await this because we don't want to slow down the user's page load
+      // Just fire the request to renew subscription if needed
+      const webhookUrl = `${siteUrl.startsWith('http') ? siteUrl : `https://${siteUrl}`}/api/webhook/register?secret=${process.env.REVALIDATE_SECRET}`;
+      fetch(webhookUrl, { method: 'POST' }).catch(err => console.error("Auto-webhook refresh failed:", err));
+    }
+  } catch (e) {
+    // Ignore errors during rendering
+  }
+
   return (
     <main className="min-h-screen bg-background transition-colors duration-300">
       {error ? (

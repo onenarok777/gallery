@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import Masonry from "react-masonry-css";
 import LightGallery from "lightgallery/react";
 import lgZoom from "lightgallery/plugins/zoom";
@@ -156,6 +156,75 @@ export default function Gallery({ initialImages, initialNextPageToken, initialTo
     500: 2,
   };
 
+  const galleryElements = useMemo(() => {
+    return images.map((img) => ({
+      src: img.src,
+      thumb: img.src,
+      downloadUrl: img.src,
+      subHtml: `<h4>${img.name || "Image"}</h4>`,
+    }));
+  }, [images]);
+
+  // Stable plugins array defined outside or via useMemo
+  const plugins = useMemo(() => [lgZoom, lgRotate, lgFullscreen, lgThumbnail], []);
+
+  // Stable callbacks
+  const onInit = useCallback((detail: any) => {
+    lightGalleryRef.current = detail.instance;
+  }, []);
+
+  const onBeforeOpen = useCallback(() => {
+    document.body.style.overflow = "hidden";
+    setTimeout(updateTotalCountDisplay, 100);
+  }, [updateTotalCountDisplay]);
+
+  const onAfterOpen = useCallback(() => {
+    updateTotalCountDisplay();
+  }, [updateTotalCountDisplay]);
+
+  // Use refs to access latest state in callbacks without re-creating them
+  const stateRef = useRef({ images, hasMore, loading });
+  useEffect(() => {
+    stateRef.current = { images, hasMore, loading };
+  }, [images, hasMore, loading]);
+
+  const loadMoreRef = useRef(loadMore);
+  useEffect(() => { loadMoreRef.current = loadMore; }, [loadMore]);
+
+  const onAfterSlide = useCallback((detail: any) => {
+      const { index } = detail;
+      currentIndexRef.current = index;
+      
+      const { images, hasMore, loading } = stateRef.current;
+      // Load more if we are near the end (e.g., within 5 slides)
+      if (index >= images.length - 5 && hasMore && !loading) {
+          loadMoreRef.current();
+      }
+      updateTotalCountDisplay();
+  }, [updateTotalCountDisplay]);
+
+  const onAfterClose = useCallback(() => {
+    document.body.style.overflow = "auto";
+  }, []);
+
+    // Create a static reference for the initial render to prevent React component from re-initializing
+  const initialGalleryElements = useMemo(() => {
+    return initialImages.map((img) => ({
+      src: img.src,
+      thumb: img.src,
+      downloadUrl: img.src,
+      subHtml: `<h4>${img.name || "Image"}</h4>`,
+    }));
+  }, []); // Empty dependency array = never changes after mount
+
+  // Manual refresh effect to handle updates without destroying the instance
+  useEffect(() => {
+    if (lightGalleryRef.current) {
+        // Refresh the instance with the new full list of images
+        lightGalleryRef.current.refresh(galleryElements);
+    }
+  }, [galleryElements]);
+
   return (
     <div className="w-full max-w-[1800px] mx-auto px-4 md:px-8 py-20">
       <header className="mb-16 text-center">
@@ -169,47 +238,24 @@ export default function Gallery({ initialImages, initialNextPageToken, initialTo
 
       {/* Hidden LightGallery - triggered programmatically */}
       <LightGallery
-        onInit={(detail) => {
-          lightGalleryRef.current = detail.instance;
-        }}
-        onBeforeOpen={() => {
-          document.body.style.overflow = "hidden";
-          // Attempt to update counter initially
-          setTimeout(updateTotalCountDisplay, 100);
-        }}
-        onAfterOpen={() => {
-             updateTotalCountDisplay();
-        }}
-
-        onAfterSlide={(detail) => {
-            const { index } = detail;
-            currentIndexRef.current = index; // Track current index
-            
-             // Load more if we are near the end (e.g., within 5 slides)
-             if (index >= images.length - 5 && hasMore && !loading) {
-                 loadMore();
-             }
-             // Ensure total count is correct
-             updateTotalCountDisplay();
-        }}
-        onAfterClose={() => {
-          document.body.style.overflow = "auto";
-        }}
-        plugins={[lgZoom, lgRotate, lgFullscreen, lgThumbnail]}
+        onInit={onInit}
+        onBeforeOpen={onBeforeOpen}
+        onAfterOpen={onAfterOpen}
+        onAfterSlide={onAfterSlide}
+        onAfterClose={onAfterClose}
+        plugins={plugins}
         speed={500}
         download={true}
         rotateLeft={true}
         rotateRight={true}
         flipHorizontal={true}
         flipVertical={true}
+        thumbnail={true}
+        toggleThumb={true}
+        allowMediaOverlap={true}
         dynamic={true}
         licenseKey="0000-0000-000-0000"
-        dynamicEl={images.map((img) => ({
-          src: img.src,
-          thumb: img.src,
-          downloadUrl: img.src,
-          subHtml: `<h4>${img.name || "Image"}</h4>`,
-        }))}
+        dynamicEl={initialGalleryElements}
       />
 
       <Masonry

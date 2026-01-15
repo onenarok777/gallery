@@ -4,7 +4,7 @@ import { getAuthenticatedDrive } from "@/lib/google-auth";
 // In-memory cache for images (cleared on server restart or by webhook)
 const imageCache = new Map<string, { data: Uint8Array; contentType: string; timestamp: number }>();
 const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hour cache
-const MAX_CACHE_SIZE = 200; // Max cached items
+// const MAX_CACHE_SIZE = unlimited; // Unlimited as requested
 
 export async function GET(
   request: NextRequest,
@@ -54,15 +54,8 @@ export async function GET(
     const name = request.nextUrl.searchParams.get("name") || "image.jpg";
     headers.set("Content-Disposition", `inline; filename="${encodeURIComponent(name)}"`);
 
-    // Store in cache (with size limit)
-    if (imageCache.size >= MAX_CACHE_SIZE) {
-      // Remove oldest entries
-      const entries = Array.from(imageCache.entries());
-      entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-      for (let i = 0; i < 20; i++) {
-        imageCache.delete(entries[i][0]);
-      }
-    }
+    // Store in cache (UNLIMITED size as requested)
+    // Warning: Monitor server memory usage
     imageCache.set(cacheKey, { data: imageData, contentType, timestamp: Date.now() });
 
     return new NextResponse(imageData.buffer.slice(imageData.byteOffset, imageData.byteOffset + imageData.byteLength) as ArrayBuffer, { headers });
