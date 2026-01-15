@@ -1,6 +1,6 @@
 import { getDriveImages, getTotalImageCount } from "./actions/google-drive";
 import Gallery from "@/components/Gallery";
-import { ThemeToggle } from "@/components/theme-toggle";
+
 
 export const revalidate = 60; // Revalidate every 60 seconds
 

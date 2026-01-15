@@ -2,7 +2,7 @@
 
 import { getAuthenticatedDrive } from "@/lib/google-auth";
 
-export async function getDriveImages(searchQuery: string = "", pageToken?: string) {
+export async function getDriveImages(pageToken?: string) {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
   if (!folderId) {
@@ -13,10 +13,7 @@ export async function getDriveImages(searchQuery: string = "", pageToken?: strin
   try {
     const drive = getAuthenticatedDrive();
 
-    let q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
-    if (searchQuery) {
-      q += ` and (name contains '${searchQuery}' or fullText contains '${searchQuery}')`;
-    }
+    const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
 
     const response: any = await drive.files.list({
       q,
@@ -59,24 +56,20 @@ let cachedTotalCount: number | null = null;
 let lastCountTime = 0;
 const COUNT_CACHE_TTL = 3600 * 1000; // 1 hour
 
-export async function getTotalImageCount(searchQuery: string = "") {
+export async function getTotalImageCount() {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
   if (!folderId) return 0;
 
-  // Use cache if available and fresh, and no search query (search needs real count)
-  if (!searchQuery && cachedTotalCount !== null && (Date.now() - lastCountTime < COUNT_CACHE_TTL)) {
+  // Use cache if available and fresh
+  if (cachedTotalCount !== null && (Date.now() - lastCountTime < COUNT_CACHE_TTL)) {
     return cachedTotalCount;
   }
 
   try {
     const drive = getAuthenticatedDrive();
-    let q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
+    const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
     
-    if (searchQuery) {
-       q += ` and (name contains '${searchQuery}' or fullText contains '${searchQuery}')`;
-    }
-
     let total = 0;
     let pageToken: string | undefined = undefined;
 
@@ -95,11 +88,9 @@ export async function getTotalImageCount(searchQuery: string = "") {
       pageToken = response.data.nextPageToken;
     } while (pageToken);
 
-    // Update cache only if no search query
-    if (!searchQuery) {
-      cachedTotalCount = total;
-      lastCountTime = Date.now();
-    }
+    // Update cache
+    cachedTotalCount = total;
+    lastCountTime = Date.now();
 
     return total;
   } catch (error) {
