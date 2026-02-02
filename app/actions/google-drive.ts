@@ -2,7 +2,10 @@
 
 import { getAuthenticatedDrive } from "@/lib/google-auth";
 
-export async function getDriveImages(pageToken?: string) {
+import { unstable_cache } from "next/cache";
+
+// Internal fetcher function
+async function fetchDriveImages(pageToken?: string) {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
 
   if (!folderId) {
@@ -49,6 +52,26 @@ export async function getDriveImages(pageToken?: string) {
     console.error("Error fetching images from Drive:", error?.message || error);
     return { images: [], error: error?.message || "Unknown error" };
   }
+}
+
+// Exported cached version
+export async function getDriveImages(pageToken?: string) {
+  // Only cache the first page (initial load)
+  // Pagination usually implies user interaction, so fresh data is fine, 
+  // but caching page 1 is critical for initial render performance.
+  if (!pageToken) {
+    return unstable_cache(
+      async () => fetchDriveImages(pageToken),
+      ['gallery-images-first-page'], 
+      { 
+        tags: ['gallery-images'],
+        revalidate: 3600 // Fallback revalidate every hour
+      } 
+    )();
+  }
+  
+  // Subsequent pages are not cached heavily or use short cache
+  return fetchDriveImages(pageToken);
 }
 
 // Simple in-memory cache for total count

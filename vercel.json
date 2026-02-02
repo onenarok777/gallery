@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/refresh-images",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

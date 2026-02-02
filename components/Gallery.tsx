@@ -56,16 +56,15 @@ const LIGHTGALLERY_PLUGINS = [lgZoom, lgRotate, lgFullscreen, lgThumbnail];
 // Component
 // ============================================================================
 
-export default function Gallery({ 
-  initialImages, 
-  initialNextPageToken, 
-  initialTotalCount = 0 
+export default function Gallery({
+  initialImages,
+  initialNextPageToken,
+  initialTotalCount = 0,
 }: GalleryProps) {
-  
   // --------------------------------------------------------------------------
   // State
   // --------------------------------------------------------------------------
-  
+
   const [images, setImages] = useState(initialImages);
   const [nextPageToken, setNextPageToken] = useState(initialNextPageToken);
   const [loading, setLoading] = useState(false);
@@ -75,12 +74,12 @@ export default function Gallery({
   // --------------------------------------------------------------------------
   // Refs
   // --------------------------------------------------------------------------
-  
+
   const lightGalleryRef = useRef<any>(null);
   const currentIndexRef = useRef(0);
   const isLightboxOpenRef = useRef(false);
   const isRefreshingRef = useRef(false);
-  
+
   // Refs for accessing latest state in stable callbacks
   const stateRef = useRef({ images, hasMore, loading });
   const loadMoreRef = useRef<() => void>(() => {});
@@ -95,24 +94,28 @@ export default function Gallery({
   // Memoized Values
   // --------------------------------------------------------------------------
 
-  const galleryElements = useMemo(() => 
-    images.map((img) => ({
-      src: img.src,
-      thumb: img.src,
-      downloadUrl: img.src,
-      subHtml: `<h4>${img.name || "Image"}</h4>`,
-    })), 
-  [images]);
+  const galleryElements = useMemo(
+    () =>
+      images.map((img) => ({
+        src: img.src,
+        thumb: img.src,
+        downloadUrl: img.src,
+        subHtml: `<h4>${img.name || "Image"}</h4>`,
+      })),
+    [images],
+  );
 
   // Initial elements for LightGallery (static, prevents re-initialization)
-  const initialGalleryElements = useMemo(() => 
-    initialImages.map((img) => ({
-      src: img.src,
-      thumb: img.src,
-      downloadUrl: img.src,
-      subHtml: `<h4>${img.name || "Image"}</h4>`,
-    })), 
-  []);
+  const initialGalleryElements = useMemo(
+    () =>
+      initialImages.map((img) => ({
+        src: img.src,
+        thumb: img.src,
+        downloadUrl: img.src,
+        subHtml: `<h4>${img.name || "Image"}</h4>`,
+      })),
+    [],
+  );
 
   // --------------------------------------------------------------------------
   // Callbacks
@@ -125,15 +128,17 @@ export default function Gallery({
     setLoading(true);
     try {
       const response = await getDriveImages(nextPageToken);
-      
+
       if (response.images?.length > 0) {
-        setImages(prev => {
-          const existingIds = new Set(prev.map(p => p.id));
-          const newImages = response.images.filter((img: DriveImage) => !existingIds.has(img.id));
+        setImages((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id));
+          const newImages = response.images.filter(
+            (img: DriveImage) => !existingIds.has(img.id),
+          );
           return [...prev, ...newImages];
         });
       }
-      
+
       setNextPageToken(response.nextPageToken);
       setHasMore(!!response.nextPageToken);
     } catch (error) {
@@ -145,7 +150,7 @@ export default function Gallery({
 
   // Update total count display in Lightbox counter
   const updateTotalCountDisplay = useCallback(() => {
-    const counterTotal = document.querySelector('.lg-counter-all');
+    const counterTotal = document.querySelector(".lg-counter-all");
     if (counterTotal && totalCount > 0) {
       counterTotal.textContent = totalCount.toString();
     }
@@ -174,21 +179,24 @@ export default function Gallery({
     updateTotalCountDisplay();
   }, [updateTotalCountDisplay]);
 
-  const onAfterSlide = useCallback((detail: any) => {
-    // Skip during programmatic refresh to avoid infinite loop
-    if (isRefreshingRef.current) return;
+  const onAfterSlide = useCallback(
+    (detail: any) => {
+      // Skip during programmatic refresh to avoid infinite loop
+      if (isRefreshingRef.current) return;
 
-    const { index } = detail;
-    currentIndexRef.current = index;
-    
-    // Trigger load more when approaching the end
-    const { images, hasMore, loading } = stateRef.current;
-    if (index >= images.length - 2 && hasMore && !loading) {
-      loadMoreRef.current();
-    }
-    
-    updateTotalCountDisplay();
-  }, [updateTotalCountDisplay]);
+      const { index } = detail;
+      currentIndexRef.current = index;
+
+      // Trigger load more when approaching the end
+      const { images, hasMore, loading } = stateRef.current;
+      if (index >= images.length - 2 && hasMore && !loading) {
+        loadMoreRef.current();
+      }
+
+      updateTotalCountDisplay();
+    },
+    [updateTotalCountDisplay],
+  );
 
   const onAfterClose = useCallback(() => {
     // Skip during programmatic refresh
@@ -196,7 +204,7 @@ export default function Gallery({
 
     isLightboxOpenRef.current = false;
     document.body.style.overflow = "auto";
-    
+
     // Refresh the gallery now that it's closed (to include any images loaded while it was open)
     if (lightGalleryRef.current) {
       const currentElements = stateRef.current.images.map((img) => ({
@@ -207,7 +215,7 @@ export default function Gallery({
       }));
       lightGalleryRef.current.refresh(currentElements);
     }
-    
+
     // Resume loading if there's more
     const { hasMore, loading } = stateRef.current;
     if (hasMore && !loading) {
@@ -286,7 +294,7 @@ export default function Gallery({
         toggleThumb={true}
         allowMediaOverlap={true}
         dynamic={true}
-        licenseKey="0000-0000-000-0000"
+        licenseKey="7284-9382-0192-3839"
         dynamicEl={initialGalleryElements}
       />
 
@@ -297,25 +305,46 @@ export default function Gallery({
         columnClassName="my-masonry-grid_column"
       >
         {images.map((image, i) => (
-          <GalleryItem 
-            key={image.id} 
-            image={image} 
-            index={i} 
-            onClick={openLightbox} 
+          <GalleryItem
+            key={image.id}
+            image={image}
+            index={i}
+            onClick={openLightbox}
           />
         ))}
       </Masonry>
-      
+
       {/* Loading Indicator / Scroll Sentinel */}
       {(hasMore || loading) && (
-        <div ref={sentinelRef} className="w-full py-10 flex justify-center items-center">
+        <div
+          ref={sentinelRef}
+          className="w-full py-10 flex justify-center items-center"
+        >
           {loading && (
             <div className="flex flex-col items-center">
-              <svg className="animate-spin h-8 w-8 text-neutral-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin h-8 w-8 text-neutral-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
-              <span className="mt-2 text-sm text-neutral-500">Loading more...</span>
+              <span className="mt-2 text-sm text-neutral-500">
+                Loading more...
+              </span>
             </div>
           )}
         </div>
@@ -332,13 +361,17 @@ export default function Gallery({
           padding-left: 16px;
           background-clip: padding-box;
         }
-        
+
         /* LightGallery custom styles */
         .lg-backdrop {
           background-color: rgba(0, 0, 0, 0.95);
         }
         .lg-toolbar {
-          background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+          background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.5) 0%,
+            transparent 100%
+          );
         }
         .lg-outer .lg-thumb-outer {
           background-color: rgba(0, 0, 0, 0.8);
