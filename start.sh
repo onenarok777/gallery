@@ -11,15 +11,24 @@ APP_NAME="gallery-app"
 echo "🚀 Starting Full Deployment for $APP_NAME..."
 
 # ==============================================================================
+# 0. Memory Check & Cleanup (Crucial for Small VPS)
+# ==============================================================================
+echo "🧹 freeing up memory for build process..."
+# Stop the app temporarily to free up RAM for the build
+pm2 stop "$APP_NAME" 2>/dev/null || true
+
+# ==============================================================================
 # 1. Update Code & Dependencies
 # ==============================================================================
 echo "📥 Pulling latest changes from git..."
 git pull
 
 echo "📦 Installing NPM dependencies..."
-npm install
+npm install --production=false
 
 echo "🏗️  Building Next.js application..."
+# Use max-old-space-size to prevent node from grabbing too much and getting killed
+export NODE_OPTIONS="--max-old-space-size=2048" 
 npm run build
 
 # ==============================================================================
@@ -27,7 +36,7 @@ npm run build
 # ==============================================================================
 echo "🔄 Managing PM2 process..."
 
-# Check if app is running, restart if yes, start if no
+# Use existing startup config or start fresh
 if pm2 list | grep -q "$APP_NAME"; then
     pm2 restart "$APP_NAME"
     echo "   Refreshed existing process."

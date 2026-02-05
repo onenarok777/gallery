@@ -19,6 +19,11 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Save memory during build on small VPS
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
