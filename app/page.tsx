@@ -43,10 +43,10 @@ export default async function Home() {
             </svg>
           </div>
           <h2 className="text-xl md:text-2xl font-light text-neutral-800 dark:text-white mb-3 tracking-wide transition-colors">
-            No Images Found
+            แกลเลอรีว่างเปล่า
           </h2>
           <p className="text-neutral-500 dark:text-neutral-400 text-sm max-w-md text-center leading-relaxed transition-colors">
-            Your gallery is currently empty. Please check your configuration or add images to the connected Google Drive folder.
+            ยังไม่มีรูปภาพในขณะนี้ กรุณากลับมาตรวจสอบอีกครั้งในภายหลัง
           </p>
           
 
