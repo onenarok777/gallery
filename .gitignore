@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# face-service (Python)
+face-service/venv/
+face-service/__pycache__/
+face-service/**/__pycache__/
+face-service/*.pyc
+face-service/.env
+*.egg-info/
+
+# deepface model cache
+.deepface/
+.cache/

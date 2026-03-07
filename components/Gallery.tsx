@@ -18,6 +18,7 @@ import "lightgallery/css/lg-thumbnail.css";
 
 import { getDriveImages } from "@/app/actions/google-drive";
 import GalleryItem from "./GalleryItem";
+import FaceSearch from "./FaceSearch";
 
 // ============================================================================
 // Types
@@ -70,6 +71,7 @@ export default function Gallery({
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(!!initialNextPageToken);
   const [totalCount] = useState(initialTotalCount);
+  const [showFaceSearch, setShowFaceSearch] = useState(false);
 
   // --------------------------------------------------------------------------
   // Refs
@@ -159,6 +161,17 @@ export default function Gallery({
   // Open lightbox at specific index
   const openLightbox = useCallback((index: number) => {
     lightGalleryRef.current?.openGallery(index);
+  }, []);
+
+  // Open lightbox for a specific image from face search results
+  const openLightboxByImageSrc = useCallback((imageSrc: string) => {
+    const index = stateRef.current.images.findIndex(img => img.src === imageSrc);
+    if (index >= 0) {
+      lightGalleryRef.current?.openGallery(index);
+    } else {
+      // Image might not be loaded yet, open in new tab
+      window.open(imageSrc, "_blank");
+    }
   }, []);
 
   // --------------------------------------------------------------------------
@@ -267,14 +280,32 @@ export default function Gallery({
   return (
     <div className="w-full max-w-[1800px] mx-auto px-4 md:px-8 py-20">
       {/* Header */}
-      <header className="mb-16 text-center">
+      <header className="mb-16 text-center relative">
         <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-2 tracking-wide transition-colors">
           My Gallery
         </h1>
         <p className="text-neutral-500 dark:text-neutral-400 text-sm md:text-base tracking-wider transition-colors">
           Collection for GotTries
         </p>
+        <button
+          onClick={() => setShowFaceSearch(true)}
+          className="mt-6 inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-medium text-sm shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-105 transition-all duration-200"
+          id="face-search-btn"
+        >
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          ค้นหาด้วยใบหน้า
+        </button>
       </header>
+
+      {/* Face Search Modal */}
+      <FaceSearch
+        isOpen={showFaceSearch}
+        onClose={() => setShowFaceSearch(false)}
+        onResultClick={openLightboxByImageSrc}
+      />
 
       {/* LightGallery (Hidden, triggered programmatically) */}
       <LightGallery
