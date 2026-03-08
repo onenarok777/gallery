@@ -1,7 +1,7 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+# Copy the entire monorepo
 COPY . .
-# We use tsx for dev, you'd compile to JS for proper prod
-CMD ["npm", "run", "dev"]
+RUN npm install
+# Fast execution for DEV mode
+CMD ["npm", "run", "dev", "--workspace=@gallery/api"]

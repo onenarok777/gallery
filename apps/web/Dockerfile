@@ -1,6 +1,6 @@
 FROM node:20-alpine
 WORKDIR /app
-COPY package*.json ./
-RUN npm install
+# Copy the entire monorepo
 COPY . .
-CMD ["npm", "run", "dev"]
+RUN npm install
+CMD ["npm", "run", "dev", "--workspace=@gallery/web"]
