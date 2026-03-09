@@ -39,20 +39,18 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Face index error:", response.status, errorText);
       return NextResponse.json(
-        { error: "Face indexing failed", details: errorText },
+        { success: false, error: "Face indexing failed", details: errorText },
         { status: response.status }
       );
     }
 
     const result = await response.json();
-    return NextResponse.json(result);
+    return NextResponse.json({ success: true, data: result });
 
   } catch (error: any) {
-    console.error("Face index proxy error:", error?.message || error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

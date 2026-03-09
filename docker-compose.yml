@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 networks:
   gallery_internal:
@@ -6,7 +6,7 @@ networks:
 
 services:
   web:
-    build: 
+    build:
       context: .
       dockerfile: ./apps/web/Dockerfile
     ports:
@@ -27,7 +27,10 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - face-service
+      face-service:
+        condition: service_started
+      postgres:
+        condition: service_healthy
     networks:
       - gallery_internal
     environment:
@@ -58,6 +61,26 @@ services:
       - qdrant_data:/qdrant/storage
     restart: unless-stopped
 
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - gallery_internal
+    environment:
+      - POSTGRES_USER=gallery_admin
+      - POSTGRES_PASSWORD=gallery_password
+      - POSTGRES_DB=gallery_db
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gallery_admin -d gallery_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   qdrant_data:
   publicmodels_data:
+  db_data:

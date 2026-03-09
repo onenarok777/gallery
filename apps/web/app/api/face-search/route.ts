@@ -47,30 +47,26 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Face service error:", response.status, errorText);
       return NextResponse.json(
-        { error: "Face search failed", details: errorText },
+        { success: false, error: "Face search failed", details: errorText },
         { status: response.status }
       );
     }
 
     const result = await response.json();
 
-    // Enrich results with image URLs for the frontend
     if (result.results) {
       result.results = result.results.map((r: any) => ({
         ...r,
-        // Build the image URL using the existing drive-image proxy
         imageSrc: `/api/drive-image/${r.drive_image_id}?name=${encodeURIComponent(r.image_name || "image.jpg")}`,
       }));
     }
 
-    return NextResponse.json(result);
+    return NextResponse.json({ success: true, data: result });
 
   } catch (error: any) {
-    console.error("Face search proxy error:", error?.message || error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { success: false, error: "Internal server error" },
       { status: 500 }
     );
   }

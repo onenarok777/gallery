@@ -11,7 +11,9 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "start": "turbo run start"
+    "start": "turbo run start",
+    "db:push": "npm run db:push --workspace=@gallery/api",
+    "db:generate": "npm run db:generate --workspace=@gallery/api"
   },
   "devDependencies": {
     "turbo": "latest"

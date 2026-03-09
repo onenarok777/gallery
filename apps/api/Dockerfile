@@ -3,5 +3,5 @@ WORKDIR /app
 # Copy the entire monorepo
 COPY . .
 RUN npm install
-# Fast execution for DEV mode
-CMD ["npm", "run", "dev", "--workspace=@gallery/api"]
+# Run migrations and then start the dev server
+CMD ["sh", "-c", "npm run db:push --workspace=@gallery/api && npm run dev --workspace=@gallery/api"]

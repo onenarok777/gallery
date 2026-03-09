@@ -125,13 +125,13 @@ export default function FaceSearch({
 
       const data = await response.json();
 
-      if (data.query_faces_count === 0) {
+      if (data.data?.query_faces_count === 0) {
         setError("ไม่พบใบหน้าในรูปที่อัพโหลด กรุณาลองรูปอื่น");
-      } else if (data.results.length === 0) {
+      } else if (!data.data?.results || data.data.results.length === 0) {
         setError("ไม่พบรูปที่ตรงกัน ลองลด threshold ดู");
       }
 
-      setResults(data.results || []);
+      setResults(data.data?.results || []);
       setHasSearched(true);
     } catch (err: any) {
       setError(err.message || "เกิดข้อผิดพลาด กรุณาลองใหม่");

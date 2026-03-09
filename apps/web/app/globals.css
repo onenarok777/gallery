@@ -4,6 +4,9 @@
   /* Light mode defaults (Opposite of current dark theme) */
   --background: #ffffff;
   --foreground: #000000;
+  --default-font-family:
+    var(--font-noto-sans-thai), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 [data-theme="dark"] {
@@ -23,7 +26,9 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 @keyframes shimmer {
