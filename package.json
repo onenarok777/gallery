@@ -1,6 +1,7 @@
 {
   "name": "gallery-monorepo",
   "version": "1.0.0",
+  "packageManager": "npm@11.1.0",
   "private": true,
   "workspaces": [
     "apps/*",
