@@ -34,7 +34,8 @@ services:
     networks:
       - gallery_internal
     environment:
-      - FACE_SERVICE_URL=http://face-service:8000
+      - FACE_SERVICE_URL=http://face-service:5001
+      - DATABASE_URL=postgres://gallery_admin:gallery_password@postgres:5432/gallery_db
     restart: unless-stopped
 
   face-service:
@@ -42,7 +43,7 @@ services:
       context: ./apps/face-service
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "5001:5001"
     depends_on:
       - qdrant
     networks:

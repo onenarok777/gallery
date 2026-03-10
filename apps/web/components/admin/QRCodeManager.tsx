@@ -45,10 +45,10 @@ export default function QRCodeManager({
 
   return (
     <div
-      className="flex flex-col items-center gap-8 py-10 bg-neutral-50 dark:bg-[#1f2335]/50 rounded-2xl border border-neutral-200/60 dark:border-[#292e42]/50 shadow-sm animate-in fade-in duration-500"
+      className="flex flex-col items-center gap-8 py-10 bg-neutral-50 dark:bg-[#1f2335]/50 rounded-lg border border-neutral-200/60 dark:border-[#292e42]/50 shadow-sm animate-in fade-in duration-500"
     >
       <div
-        className="bg-white p-6 rounded-2xl shadow-xl shadow-violet-500/5 border border-neutral-100 dark:border-none ring-4 ring-neutral-100/50 dark:ring-[#292e42]/30"
+        className="bg-white p-6 rounded-lg shadow-xl shadow-violet-500/5 border border-neutral-100 dark:border-none ring-4 ring-neutral-100/50 dark:ring-[#292e42]/30"
         ref={qrRef}
       >
         <QRCodeSVG

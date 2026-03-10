@@ -21,7 +21,7 @@ const Button = ({
   disabled,
   ...props
 }: ButtonProps) => {
-  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl";
+  const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg";
   
   const variants = {
     primary: "bg-violet-600 hover:bg-violet-700 text-white shadow-sm ring-violet-500/20 active:scale-[0.98]",

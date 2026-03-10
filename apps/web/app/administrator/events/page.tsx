@@ -16,6 +16,9 @@ interface Event {
   driveLink: string;
   googleLink?: string;
   googleFolderLink?: string;
+  qrLogoUrl?: string | null;
+  qrFgColor?: string;
+  qrBgColor?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -62,6 +65,8 @@ export default function AdminEventsPage() {
     {
       key: "title",
       header: "ชื่องาน",
+      headerClassName: "w-[70%]",
+      className: "w-[70%]",
       render: (event) => (
         <div className="flex flex-col">
           <Text className="font-bold text-neutral-900 dark:text-[#c0caf5]">
@@ -83,6 +88,8 @@ export default function AdminEventsPage() {
     {
       key: "updatedAt",
       header: "แก้ไขล่าสุด",
+      headerClassName: "w-[20%]",
+      className: "w-[20%]",
       render: (event) => (
         <Text className="text-sm text-neutral-400 dark:text-[#565f89]">
           {new Date(event.updatedAt).toLocaleDateString("th-TH", {
@@ -98,7 +105,7 @@ export default function AdminEventsPage() {
     {
       key: "actions",
       header: "จัดการ",
-      headerClassName: "w-[120px] text-right",
+      headerClassName: "w-[10%] text-right",
       className: "text-right",
       render: (event) => (
         <Dropdown
@@ -158,7 +165,7 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="w-full px-6 animate-in fade-in duration-700">
+    <div className="w-full animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
         <div>
           <Heading as="h2" className="mb-2">

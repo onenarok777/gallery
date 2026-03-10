@@ -12,7 +12,7 @@ export default function AdminDashboardPage() {
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto animate-in fade-in duration-700">
+    <div className="w-full animate-in fade-in duration-700">
       <div className="mb-10">
         <Heading
           as="h2"
@@ -28,7 +28,7 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Total Events Card */}
         <div
-          className="relative overflow-hidden group p-8 rounded-3xl bg-white dark:bg-[#1f2335] border border-neutral-200 dark:border-[#292e42] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          className="relative overflow-hidden group p-8 rounded-lg bg-white dark:bg-[#1f2335] border border-neutral-200 dark:border-[#292e42] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
         >
           <div className="absolute -right-6 -top-6 opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-neutral-900 dark:text-[#c0caf5]">
             <CalendarDays size={160} />

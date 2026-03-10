@@ -74,7 +74,7 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
       className="mb-4 group"
       style={{ aspectRatio: image.width && image.height ? `${image.width}/${image.height}` : '4/3' }}
     >
-      <div className="relative w-full h-full overflow-hidden rounded-xl bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300">
+      <div className="relative w-full h-full overflow-hidden rounded-lg bg-neutral-100 dark:bg-neutral-900 transition-colors duration-300">
         
         {/* Loading State Overlay */}
         {!isLoaded && !hasError && (

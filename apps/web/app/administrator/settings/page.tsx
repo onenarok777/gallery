@@ -11,7 +11,7 @@ export default function AdminSettingsPage() {
   const [faceSearchEnabled, setFaceSearchEnabled] = useState(true);
 
   return (
-    <div className="max-w-3xl mx-auto animate-in fade-in duration-700">
+    <div className="w-full animate-in fade-in duration-700">
       <div className="mb-10">
         <Heading as="h2" className="mb-2">
           Settings
@@ -23,7 +23,7 @@ export default function AdminSettingsPage() {
 
       <div className="space-y-8">
         {/* Appearance Section */}
-        <section className="p-8 rounded-3xl bg-white dark:bg-[#1f2335] shadow-sm border border-neutral-100 dark:border-[#292e42] animate-in slide-in-from-bottom-4 duration-500">
+        <section className="p-8 rounded-lg bg-white dark:bg-[#1f2335] shadow-sm border border-neutral-100 dark:border-[#292e42] animate-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-1.5 h-6 bg-violet-600 dark:bg-violet-500 rounded-full" />
             <Heading as="h4">การแสดงผล</Heading>

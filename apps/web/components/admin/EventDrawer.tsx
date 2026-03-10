@@ -100,14 +100,7 @@ export default function EventDrawer({
       />
 
       {/* Responsive Panel */}
-      <div className="fixed z-101 
-        /* Mobile: Full Screen Sheet */
-        top-0 bottom-0 left-0 right-0 h-screen
-        /* Desktop: Full Height Side Drawer */
-        md:top-0 md:bottom-0 md:left-auto md:right-0 md:h-screen md:w-full md:max-w-xl md:rounded-none
-        bg-white dark:bg-[#1a1b26] border-t md:border-t-0 md:border-l border-neutral-200 dark:border-[#292e42] shadow-2xl 
-        transition-all animate-in slide-in-from-bottom md:slide-in-from-right duration-500 flex flex-col overflow-hidden"
-      >
+      <div className="fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-[#1a1b26] shadow-2xl z-50 overflow-y-auto animate-in slide-in-from-right duration-500 rounded-l-lg border-l border-neutral-100 dark:border-[#292e42]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-neutral-100 dark:border-[#292e42] flex items-center justify-between shrink-0">
           <div>
@@ -127,7 +120,7 @@ export default function EventDrawer({
         {/* Content Area */}
         <div className="grow overflow-y-auto p-6 pb-12">
           {error ? (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-[#f7768e] p-4 rounded-xl border border-red-200 dark:border-red-900/30 text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-[#f7768e] p-4 rounded-lg border border-red-200 dark:border-red-900/30 text-sm">
               พบข้อผิดพลาด: {error}
             </div>
           ) : isLoading ? (

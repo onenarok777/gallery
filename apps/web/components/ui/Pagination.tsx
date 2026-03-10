@@ -56,7 +56,7 @@ export default function Pagination({
       key={page}
       onClick={() => onPageChange(page)}
       disabled={disabled}
-      className={`min-w-[36px] h-9 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 ${
+      className={`min-w-[36px] h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all duration-200 ${
         currentPage === page
           ? "bg-violet-600 dark:bg-violet-500 text-white shadow-md shadow-violet-500/20"
           : "text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white"
@@ -71,7 +71,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(Math.max(1, currentPage - 1))}
         disabled={currentPage === 1 || disabled}
-        className="p-2 rounded-xl text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        className="p-2 rounded-lg text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
       >
         <ChevronLeft size={18} />
       </button>
@@ -83,7 +83,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         disabled={currentPage === totalPages || disabled}
-        className="p-2 rounded-xl text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+        className="p-2 rounded-lg text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
       >
         <ChevronRight size={18} />
       </button>

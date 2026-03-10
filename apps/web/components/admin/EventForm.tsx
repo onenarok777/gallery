@@ -90,7 +90,7 @@ export default function EventForm({
   return (
     <form onSubmit={handleSubmit} ref={onFormRef} className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-[#f7768e] rounded-xl border border-red-200 dark:border-red-900/30 text-sm font-medium animate-in fade-in zoom-in duration-200">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-[#f7768e] rounded-lg border border-red-200 dark:border-red-900/30 text-sm font-medium animate-in fade-in zoom-in duration-200">
           {error}
         </div>
       )}

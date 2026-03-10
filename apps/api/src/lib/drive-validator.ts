@@ -18,25 +18,25 @@ export async function isFolderPublic(folderId: string): Promise<boolean> {
   const drive = getAuthenticatedDrive();
   
   try {
-    // Check permissions of the folder
-    const response = await drive.permissions.list({
+    // Try to get folder metadata. If it's public (Anyone with the link), 
+    // or shared with the Service Account, this will succeed.
+    const response = await drive.files.get({
       fileId: folderId,
-      fields: "permissions(type,role)",
+      fields: "id, name, mimeType",
     });
 
-    const permissions = response.data.permissions || [];
-    
-    // Check if there's a permission where type is 'anyone' and role is 'reader' (or 'writer', 'owner')
-    const isPublic = permissions.some(p => 
-      p.type === "anyone" && (p.role === "reader" || p.role === "commenter" || p.role === "writer")
-    );
-
-    return isPublic;
-  } catch (error: any) {
-    console.error("Error checking folder permissions:", error.message);
-    if (error.code === 404) {
-      throw new Error("Folder not found or Service Account has no access");
+    if (response.data.mimeType !== "application/vnd.google-apps.folder") {
+      throw new Error("ID นี้ไม่ใช่โฟลเดอร์ (ID is not a folder)");
     }
+
+    return true;
+  } catch (error: any) {
+    console.error("Error checking folder access:", error.message);
+    
+    if (error.code === 404 || error.code === 403) {
+      throw new Error("ไม่พบโฟลเดอร์ หรือไม่ได้เปิดแชร์แบบสาธารณะ (Folder not found or not public)");
+    }
+    
     throw new Error(`Google Drive API error: ${error.message}`);
   }
 }

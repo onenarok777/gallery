@@ -83,7 +83,9 @@ export default function Dropdown({
           ? `${coords.left + coords.width - 192}px` 
           : `${coords.left}px`,
       }}
-      className="z-9999 w-48 origin-top-right rounded-2xl bg-white dark:bg-[#1a1b26] shadow-2xl ring-1 ring-black/5 dark:ring-[#292e42] focus:outline-hidden animate-in zoom-in-95 fade-in duration-200"
+      className={`z-9999 w-48 rounded-lg bg-white dark:bg-[#1a1b26] shadow-2xl ring-1 ring-black/5 dark:ring-[#292e42] focus:outline-hidden animate-in fade-in zoom-in-75 slide-in-from-top-2 duration-300 ${
+        align === "right" ? "origin-top-right" : "origin-top-left"
+      }`}
     >
       <div className="p-1.5 space-y-0.5">
         {items.map((item, index) => (
@@ -94,7 +96,7 @@ export default function Dropdown({
               item.onClick();
               setIsOpen(false);
             }}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-xl transition-colors cursor-pointer ${
+            className={`w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors cursor-pointer ${
               item.variant === "danger"
                 ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10"
                 : "text-neutral-700 dark:text-[#c0caf5] hover:bg-neutral-50 dark:hover:bg-[#1f2335]"
@@ -117,7 +119,7 @@ export default function Dropdown({
         }}
       >
         {trigger || (
-          <button className="p-2 rounded-xl hover:bg-neutral-100 dark:hover:bg-[#1f2335] text-neutral-400 dark:text-[#565f89] transition-all cursor-pointer">
+          <button className="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-[#1f2335] text-neutral-400 dark:text-[#565f89] transition-all cursor-pointer">
             <MoreVertical size={18} />
           </button>
         )}

@@ -170,13 +170,13 @@ export default function FaceSearch({
       {/* Modal */}
       <div className="fixed inset-0 z-50 overflow-y-auto flex items-start justify-center p-4 pt-[5vh]">
         <div
-          className="relative w-full max-w-2xl bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 transition-colors"
+          className="relative w-full max-w-2xl bg-white dark:bg-neutral-900 rounded-lg shadow-2xl border border-neutral-200 dark:border-neutral-800 transition-colors"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -211,7 +211,7 @@ export default function FaceSearch({
                 onDragLeave={handleDragLeave}
                 onClick={() => fileInputRef.current?.click()}
                 className={`
-                  relative border-2 border-dashed rounded-xl p-10 text-center cursor-pointer
+                  relative border-2 border-dashed rounded-lg p-10 text-center cursor-pointer
                   transition-all duration-200
                   ${dragOver
                     ? "border-violet-500 bg-violet-50 dark:bg-violet-950/30"
@@ -246,7 +246,7 @@ export default function FaceSearch({
             ) : (
               /* Preview */
               <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <div className="relative w-32 h-32 rounded-xl overflow-hidden border-2 border-violet-500 flex-shrink-0">
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-violet-500 flex-shrink-0">
                   <img
                     src={previewUrl}
                     alt="Preview"
@@ -299,7 +299,7 @@ export default function FaceSearch({
                     onClick={handleSearch}
                     disabled={loading}
                     className={`
-                      w-full py-2.5 px-4 rounded-xl font-medium text-sm
+                      w-full py-2.5 px-4 rounded-lg font-medium text-sm
                       transition-all duration-200 flex items-center justify-center gap-2
                       ${loading
                         ? "bg-neutral-300 dark:bg-neutral-700 text-neutral-500 cursor-not-allowed"
@@ -332,7 +332,7 @@ export default function FaceSearch({
 
             {/* Error */}
             {error && (
-              <div className="mt-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
+              <div className="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800">
                 <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
               </div>
             )}

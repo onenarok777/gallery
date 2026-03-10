@@ -18,7 +18,7 @@ export default function AdminSidebar() {
       <div className="flex flex-col h-full gap-8">
         <div className="px-2 pt-2">
           <div className="flex items-center gap-3">
-            <div className="bg-violet-100 dark:bg-[#7aa2f7]/10 p-2.5 rounded-2xl shadow-sm ring-1 ring-violet-200 dark:ring-[#7aa2f7]/20">
+            <div className="bg-violet-100 dark:bg-[#7aa2f7]/10 p-2.5 rounded-lg shadow-sm ring-1 ring-violet-200 dark:ring-[#7aa2f7]/20">
               <ImageIcon
                 size={22}
                 className="text-violet-600 dark:text-[#7aa2f7]"
@@ -49,7 +49,7 @@ export default function AdminSidebar() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group relative flex items-center px-4 py-3 rounded-xl text-sm transition-all duration-300 ${
+                className={`group relative flex items-center px-4 py-3 rounded-lg text-sm transition-all duration-300 ${
                   isActive
                     ? "bg-violet-50 dark:bg-[#7aa2f7]/10 text-violet-700 dark:text-[#7aa2f7] font-semibold"
                     : "text-neutral-600 dark:text-[#565f89] hover:bg-neutral-50 dark:hover:bg-[#292e42]/50 hover:text-neutral-900 dark:hover:text-[#c0caf5]"
@@ -75,7 +75,7 @@ export default function AdminSidebar() {
         <div className="pt-6 border-t border-neutral-100 dark:border-[#292e42]">
           <Link
             href="/"
-            className="flex items-center px-4 py-3 rounded-xl text-sm font-semibold text-neutral-500 dark:text-[#565f89] hover:text-neutral-900 dark:hover:text-[#c0caf5] hover:bg-neutral-50 dark:hover:bg-[#292e42]/50 transition-all duration-300"
+            className="flex items-center px-4 py-3 rounded-lg text-sm font-semibold text-neutral-500 dark:text-[#565f89] hover:text-neutral-900 dark:hover:text-[#c0caf5] hover:bg-neutral-50 dark:hover:bg-[#292e42]/50 transition-all duration-300"
           >
             <span className="mr-2">←</span> Back to Site
           </Link>

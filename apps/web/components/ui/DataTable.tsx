@@ -35,7 +35,7 @@ export default function DataTable<T extends { id: string | number }>({
 }: DataTableProps<T>) {
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-3xl border border-neutral-100 dark:border-[#292e42] bg-white dark:bg-[#1a1b26] shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-neutral-100 dark:border-[#292e42] bg-white dark:bg-[#1a1b26] shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             {showHeader && (
@@ -44,7 +44,7 @@ export default function DataTable<T extends { id: string | number }>({
                   {columns.map((column) => (
                     <th
                       key={column.key}
-                      className={`px-6 py-4 text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-[#565f89] ${column.headerClassName || ""}`}
+                      className={`px-4 py-2 text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-[#565f89] ${column.headerClassName || ""}`}
                     >
                       {column.header}
                     </th>
@@ -85,7 +85,7 @@ export default function DataTable<T extends { id: string | number }>({
                     {columns.map((column) => (
                       <td
                         key={`${item.id}-${column.key}`}
-                        className={`px-6 py-4 text-sm text-neutral-700 dark:text-[#c0caf5] ${column.className || ""}`}
+                        className={`px-4 py-2 text-sm text-neutral-700 dark:text-[#c0caf5] ${column.className || ""}`}
                       >
                         {column.render ? column.render(item) : (item as Record<string, any>)[column.key]}
                       </td>
