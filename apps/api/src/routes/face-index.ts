@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { successResponse, errorResponse } from '../lib/response';
 
 const faceIndexApp = new Hono()
 
@@ -11,7 +12,7 @@ faceIndexApp.post('/', async (c) => {
     const { drive_image_id, image_name } = body;
 
     if (!drive_image_id) {
-      return c.json({ error: "Missing drive_image_id" }, 400);
+      return errorResponse(c, "Missing drive_image_id", 400);
     }
 
     const formData = new FormData();
@@ -31,19 +32,14 @@ faceIndexApp.post('/', async (c) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Face index error:", response.status, errorText);
-      return c.json(
-        { error: "Face indexing failed", details: errorText },
-        response.status as any
-      );
+      return errorResponse(c, `Face indexing failed: ${errorText}`, response.status);
     }
 
     const result = await response.json();
-    return c.json(result);
+    return successResponse(c, result);
 
   } catch (error: any) {
-    console.error("Face index proxy error:", error?.message || error);
-    return c.json({ error: "Internal server error" }, 500);
+    return errorResponse(c, "Internal server error", 500);
   }
 })
 

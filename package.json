@@ -1,16 +1,20 @@
 {
   "name": "gallery-monorepo",
   "version": "1.0.0",
+  "packageManager": "npm@11.1.0",
   "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
+    "predev": "lsof -ti :3000 | xargs kill -9 2>/dev/null; lsof -ti :4000 | xargs kill -9 2>/dev/null; rm -f apps/web/.next/dev/lock; true",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "lint": "turbo run lint",
-    "start": "turbo run start"
+    "start": "turbo run start",
+    "db:push": "npm run db:push --workspace=@gallery/api",
+    "db:generate": "npm run db:generate --workspace=@gallery/api"
   },
   "devDependencies": {
     "turbo": "latest"

@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { getAuthenticatedDrive } from '../lib/google-auth'
 import { v4 as uuidv4 } from "uuid";
+import { successResponse, errorResponse } from '../lib/response';
 
 const webhookApp = new Hono()
 
@@ -12,16 +13,16 @@ webhookApp.post('/register', async (c) => {
   const secret = c.req.query("secret");
 
   if (!REVALIDATE_SECRET || secret !== REVALIDATE_SECRET) {
-    return c.json({ success: false, error: "Invalid or missing secret" }, 401);
+    return errorResponse(c, "Invalid or missing secret", 401);
   }
 
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
   if (!folderId) {
-    return c.json({ success: false, error: "Missing GOOGLE_DRIVE_FOLDER_ID" }, 500);
+    return errorResponse(c, "Missing GOOGLE_DRIVE_FOLDER_ID", 500);
   }
 
   if (!WEBHOOK_URL) {
-    return c.json({ success: false, error: "Missing NEXT_PUBLIC_SITE_URL or VERCEL_URL" }, 500);
+    return errorResponse(c, "Missing NEXT_PUBLIC_SITE_URL or VERCEL_URL", 500);
   }
 
   try {
@@ -43,32 +44,22 @@ webhookApp.post('/register', async (c) => {
       },
     });
 
-    console.log("Webhook registered:", response.data);
-
-    return c.json({
-      success: true,
+    return successResponse(c, {
       message: "Webhook registered successfully",
-      data: {
-        channelId: response.data.id,
-        resourceId: response.data.resourceId,
-        expiration: new Date(parseInt(response.data.expiration || "0")).toISOString(),
-        webhookUrl,
-      },
+      channelId: response.data.id,
+      resourceId: response.data.resourceId,
+      expiration: new Date(parseInt(response.data.expiration || "0")).toISOString(),
+      webhookUrl,
       note: "Webhook expires in 24 hours. Set up a cron job to renew it daily.",
     });
 
   } catch (error: any) {
     console.error("Failed to register webhook:", error?.message || error);
     
-    if (error?.code === 401) {
-      return c.json({ success: false, error: "Authentication failed. Check service account credentials." }, 401);
-    }
+    const status = error?.code === 401 || error?.code === 403 ? error.code : 500;
+    const msg = error?.code === 401 ? "Authentication failed" : (error?.code === 403 ? "Permission denied" : error?.message || "Unknown error");
     
-    if (error?.code === 403) {
-      return c.json({ success: false, error: "Permission denied. Make sure the service account has access to the folder." }, 403);
-    }
-
-    return c.json({ success: false, error: error?.message || "Unknown error" }, 500);
+    return errorResponse(c, msg, status);
   }
 })
 
@@ -79,11 +70,11 @@ webhookApp.delete('/register', async (c) => {
   const resourceId = c.req.query("resourceId");
 
   if (!REVALIDATE_SECRET || secret !== REVALIDATE_SECRET) {
-    return c.json({ success: false, error: "Invalid or missing secret" }, 401);
+    return errorResponse(c, "Invalid or missing secret", 401);
   }
 
   if (!channelId || !resourceId) {
-    return c.json({ success: false, error: "Missing channelId or resourceId" }, 400);
+    return errorResponse(c, "Missing channelId or resourceId", 400);
   }
 
   try {
@@ -95,11 +86,10 @@ webhookApp.delete('/register', async (c) => {
       },
     });
 
-    return c.json({ success: true, message: "Webhook stopped successfully" });
+    return successResponse(c, { message: "Webhook stopped successfully" });
 
   } catch (error: any) {
-    console.error("Failed to stop webhook:", error?.message || error);
-    return c.json({ success: false, error: error?.message || "Unknown error" }, 500);
+    return errorResponse(c, error?.message || "Unknown error", 500);
   }
 })
 
@@ -109,7 +99,7 @@ webhookApp.get('/register', (c) => {
     ? `${WEBHOOK_URL.startsWith("http") ? WEBHOOK_URL : `https://${WEBHOOK_URL}`}/api/revalidate`
     : "https://your-site.vercel.app/api/revalidate";
 
-  return c.json({
+  return successResponse(c, {
     instructions: {
       step1: "Add REVALIDATE_SECRET to your .env file",
       step2: "Add NEXT_PUBLIC_SITE_URL to your .env file (e.g., https://your-site.vercel.app)",
@@ -129,4 +119,4 @@ webhookApp.get('/register', (c) => {
   });
 })
 
-export default webhookApp
+export default webhookApp;

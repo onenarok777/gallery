@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import "./globals.css";
+import "@radix-ui/themes/styles.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Theme } from "@radix-ui/themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +42,14 @@ export default function RootLayout({
           disableTransitionOnChange
           storageKey="theme-mode" // Force reset to system default (ignore old local storage)
         >
-          {children}
+          <Theme
+            accentColor="violet"
+            grayColor="slate"
+            radius="large"
+            appearance="inherit"
+          >
+            {children}
+          </Theme>
         </ThemeProvider>
       </body>
     </html>

@@ -19,6 +19,6 @@ COPY . .
 # This avoids downloading on first request
 RUN python -c "from deepface import DeepFace; import numpy as np; DeepFace.represent(np.zeros((50,50,3), dtype=np.uint8), model_name='Facenet', detector_backend='opencv', enforce_detection=False)" || true
 
-EXPOSE 8000
+EXPOSE 5001
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5001", "--workers", "1"]

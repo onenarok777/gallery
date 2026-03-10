@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { successResponse, errorResponse } from '../lib/response';
 
 const faceSearchApp = new Hono()
 
@@ -13,14 +14,13 @@ faceSearchApp.post('/', async (c) => {
     const limit = formData.get("limit");
 
     if (!file) {
-      return c.json({ error: "No file uploaded" }, 400);
+      return errorResponse(c, "No file uploaded", 400);
     }
 
     const params = new URLSearchParams();
     if (typeof threshold === 'string') params.set("threshold", threshold);
     if (typeof limit === 'string') params.set("limit", limit);
 
-    // Filter FormData to exclude non-Blob data if needed, or reconstruct
     const forwardFormData = new FormData();
     forwardFormData.append("file", file);
 
@@ -38,29 +38,22 @@ faceSearchApp.post('/', async (c) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Face service error:", response.status, errorText);
-      return c.json(
-        { error: "Face search failed", details: errorText },
-        response.status as any
-      );
+      return errorResponse(c, `Face search failed: ${errorText}`, response.status);
     }
 
     const result = await response.json();
 
-    // Enrich results with image URLs for the frontend
     if (result.results) {
       result.results = result.results.map((r: any) => ({
         ...r,
-        // Update to use the new Hono API URL internal routing
         imageSrc: `/api/drive-image/${r.drive_image_id}?name=${encodeURIComponent(r.image_name || "image.jpg")}`,
       }));
     }
 
-    return c.json(result);
+    return successResponse(c, result);
 
   } catch (error: any) {
-    console.error("Face search proxy error:", error?.message || error);
-    return c.json({ error: "Internal server error" }, 500);
+    return errorResponse(c, "Internal server error", 500);
   }
 })
 
