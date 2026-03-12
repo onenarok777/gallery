@@ -92,8 +92,7 @@ app.post('/', async (c) => {
     const [newEvent] = await db.insert(events).values({ 
       id,
       title, 
-      driveLink: googleFolderLink,
-      googleFolderLink: googleFolderLink 
+      driveLink: googleFolderLink
     }).returning();
 
     // Initialize QR settings
@@ -120,7 +119,6 @@ app.put('/:id', async (c) => {
       const folderId = extractFolderId(googleFolderLink);
       if (folderId) {
         eventUpdate.driveLink = googleFolderLink;
-        eventUpdate.googleFolderLink = googleFolderLink;
       }
     }
 

@@ -65,8 +65,8 @@ export default function AdminEventsPage() {
     {
       key: "title",
       header: "ชื่องาน",
-      headerClassName: "w-[70%]",
-      className: "w-[70%]",
+      headerClassName: "w-auto md:w-[70%]",
+      className: "w-auto md:w-[70%]",
       render: (event) => (
         <div className="flex flex-col">
           <Text className="font-bold text-neutral-900 dark:text-[#c0caf5]">
@@ -88,8 +88,8 @@ export default function AdminEventsPage() {
     {
       key: "updatedAt",
       header: "แก้ไขล่าสุด",
-      headerClassName: "w-[20%]",
-      className: "w-[20%]",
+      headerClassName: "hidden md:table-cell w-[20%]",
+      className: "hidden md:table-cell w-[20%]",
       render: (event) => (
         <Text className="text-sm text-neutral-400 dark:text-[#565f89]">
           {new Date(event.updatedAt).toLocaleDateString("th-TH", {
@@ -105,8 +105,8 @@ export default function AdminEventsPage() {
     {
       key: "actions",
       header: "จัดการ",
-      headerClassName: "w-[10%] text-right",
-      className: "text-right",
+      headerClassName: "w-20 md:w-[10%] text-right",
+      className: "w-20 md:w-[10%] text-right",
       render: (event) => (
         <Dropdown
           items={[

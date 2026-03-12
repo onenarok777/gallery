@@ -95,12 +95,12 @@ export default function EventDrawer({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-100 transition-opacity animate-in fade-in duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[60] transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
 
       {/* Responsive Panel */}
-      <div className="fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-[#1a1b26] shadow-2xl z-50 overflow-y-auto animate-in slide-in-from-right duration-500 rounded-l-lg border-l border-neutral-100 dark:border-[#292e42]">
+      <div className="fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-[#1a1b26] shadow-2xl z-[70] overflow-y-auto animate-in slide-in-from-right duration-500 rounded-l-lg border-l border-neutral-100 dark:border-[#292e42]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-neutral-100 dark:border-[#292e42] flex items-center justify-between shrink-0">
           <div>

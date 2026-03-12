@@ -199,11 +199,11 @@ export default function QRCodeDrawer({
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-100 transition-opacity animate-in fade-in duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[60] transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
 
-      <div className="fixed z-101 top-0 bottom-0 left-0 right-0 h-screen md:left-auto md:right-0 md:w-full md:max-w-xl bg-white dark:bg-[#1a1b26] border-l border-neutral-200 dark:border-[#292e42] shadow-2xl transition-all animate-in slide-in-from-right duration-500 flex flex-col overflow-hidden">
+      <div className="fixed z-[70] top-0 bottom-0 left-0 right-0 h-screen md:left-auto md:right-0 md:w-full md:max-w-xl bg-white dark:bg-[#1a1b26] border-l border-neutral-200 dark:border-[#292e42] shadow-2xl transition-all animate-in slide-in-from-right duration-500 flex flex-col overflow-hidden">
         {/* Header */}
         <div className="px-6 py-5 border-b border-neutral-100 dark:border-[#292e42] flex items-center justify-between shrink-0">
           <div>
