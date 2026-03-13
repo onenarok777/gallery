@@ -2,6 +2,7 @@
 
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminBottomNav from "@/components/admin/AdminBottomNav";
+import AdminNavbar from "@/components/admin/AdminNavbar";
 import { Noto_Sans_Thai } from "next/font/google";
 import { AlertProvider } from "@/components/ui/AlertContext";
 
@@ -12,23 +13,24 @@ const notoSansThai = Noto_Sans_Thai({
   display: "swap",
 });
 
-export default function AdminLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div 
+    <div
       className={`${notoSansThai.variable} ${notoSansThai.className} min-h-screen bg-neutral-50 dark:bg-[#1a1b26] text-neutral-900 dark:text-[#c0caf5] selection:bg-violet-500/30`}
       style={{ fontFamily: "var(--font-noto-sans-thai)" }}
     >
       <AlertProvider>
         <div className="flex flex-col md:flex-row min-h-screen overflow-hidden">
           <AdminSidebar />
-          <main
-            className="flex-1 p-4 overflow-y-auto h-screen pb-24 md:pb-12"
-          >
-            {children}
+          <main className="flex-1 overflow-y-auto h-screen relative bg-neutral-50 dark:bg-[#1a1b26]">
+            <AdminNavbar />
+            <div className="p-4 pb-24 md:pb-12">
+              {children}
+            </div>
           </main>
           <AdminBottomNav />
         </div>

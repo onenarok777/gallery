@@ -1,5 +1,3 @@
-import './load-env'
-
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
@@ -26,6 +24,7 @@ import eventsApp from './routes/events'
 import uploadApp from './routes/upload'
 import qrCodeApp from './routes/qr-code'
 import proxyImageApp from './routes/proxy-image'
+import authApp from './routes/auth'
 
 // Register migrated routes
 app.route('/api/drive-image', driveImageApp)
@@ -37,6 +36,7 @@ app.route('/api/events', eventsApp)
 app.route('/api/upload', uploadApp)
 app.route('/api/qr-code', qrCodeApp)
 app.route('/api/proxy-image', proxyImageApp)
+app.route('/api/auth', authApp)
 
 const port = 4000
 console.log(`API is running on port ${port}`)
