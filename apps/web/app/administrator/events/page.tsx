@@ -32,17 +32,23 @@ export default function AdminEventsPage() {
   const alert = useAlert();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  const fetchEvents = async () => {
+  const fetchEvents = async (page = currentPage, size = itemsPerPage) => {
     setIsLoading(true);
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/events`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"}/api/events?page=${page}&page_size=${size}`,
       );
       if (res.ok) {
-        const data = await res.json();
-        setEvents(data.data || []);
+        const json = await res.json();
+        setEvents(json.data || []);
+        if (json.meta) {
+          setTotalPages(json.meta.total_page || 1);
+          setTotalItems(json.meta.total || 0);
+        }
       }
     } catch (e) {
       console.error(e);
@@ -52,14 +58,8 @@ export default function AdminEventsPage() {
   };
 
   useEffect(() => {
-    fetchEvents();
-  }, []);
-
-  const totalPages = Math.ceil(events.length / itemsPerPage);
-  const currentData = events.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+    fetchEvents(currentPage, itemsPerPage);
+  }, [currentPage, itemsPerPage]);
 
   const columns: Column<Event>[] = [
     {
@@ -72,16 +72,14 @@ export default function AdminEventsPage() {
           <Text className="font-bold text-neutral-900 dark:text-[#c0caf5]">
             {event.title}
           </Text>
-          {event.googleLink && (
-            <a 
-              href={event.googleLink} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-[10px] text-violet-500 hover:underline flex items-center gap-1 w-fit"
-            >
-              <ExternalLink size={10} /> ดูหน้าแกลเลอรี
-            </a>
-          )}
+          <a 
+            href={`/event/${event.id}`}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[10px] text-violet-500 hover:underline flex items-center gap-1 w-fit mt-1"
+          >
+            <ExternalLink size={10} /> ดูหน้าแกลเลอรี
+          </a>
         </div>
       ),
     },
@@ -188,13 +186,20 @@ export default function AdminEventsPage() {
 
       <DataTable
         columns={columns}
-        data={currentData}
+        data={events}
         isLoading={isLoading}
         emptyMessage="ยังไม่มีการสร้าง Event ใดๆ"
         pagination={{
           currentPage,
           totalPages,
+          total: totalItems,
           onPageChange: setCurrentPage,
+          pageSize: itemsPerPage,
+          pageSizeOptions: [5, 10, 20, 50, 100],
+          onPageSizeChange: (size) => {
+            setItemsPerPage(size);
+            setCurrentPage(1);
+          },
         }}
       />
 

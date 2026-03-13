@@ -25,6 +25,7 @@ import cronApp from './routes/cron'
 import eventsApp from './routes/events'
 import uploadApp from './routes/upload'
 import qrCodeApp from './routes/qr-code'
+import proxyImageApp from './routes/proxy-image'
 
 // Register migrated routes
 app.route('/api/drive-image', driveImageApp)
@@ -35,6 +36,7 @@ app.route('/api/cron', cronApp)
 app.route('/api/events', eventsApp)
 app.route('/api/upload', uploadApp)
 app.route('/api/qr-code', qrCodeApp)
+app.route('/api/proxy-image', proxyImageApp)
 
 const port = 4000
 console.log(`API is running on port ${port}`)

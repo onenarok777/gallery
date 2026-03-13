@@ -32,7 +32,8 @@ def run_indexing(
     """
     folder_id = folder_id or os.getenv("GOOGLE_DRIVE_FOLDER_ID")
     if not folder_id:
-        raise ValueError("Missing GOOGLE_DRIVE_FOLDER_ID")
+        logger.warning("Google Drive Folder ID not configured, skipping.")
+        return stats
 
     stats = {
         "total_images": 0,

@@ -42,6 +42,91 @@ function addToMemoryCache(key: string, data: Uint8Array, contentType: string) {
   currentMemoryCacheSize += size;
 }
 
+driveImageApp.get('/folder/:folderId/images', async (c) => {
+  try {
+    const folderId = c.req.param('folderId')
+    const pageToken = c.req.query('pageToken')
+    const drive = getAuthenticatedDrive()
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
+
+    const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`
+
+    const response = await drive.files.list({
+      q,
+      fields: "nextPageToken, files(id, name, mimeType, imageMediaMetadata, thumbnailLink)",
+      orderBy: "modifiedTime desc",
+      pageSize: 50,
+      pageToken: pageToken || undefined,
+    })
+
+    const files = response.data.files
+    const nextToken = response.data.nextPageToken
+
+    if (!files) return c.json({ data: { images: [], nextPageToken: undefined }, message: "" })
+
+    const images = files.map((file) => {
+      const imageSrc = `${API_URL}/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`
+
+      return {
+        id: file.id!,
+        name: file.name || "image.jpg",
+        src: imageSrc,
+        originalSrc: imageSrc,
+        mimeType: file.mimeType || "image/jpeg",
+        width: file.imageMediaMetadata?.width ?? undefined,
+        height: file.imageMediaMetadata?.height ?? undefined,
+      }
+    })
+
+    return c.json({ data: { images, nextPageToken: nextToken ?? undefined }, message: "" })
+  } catch (error: any) {
+    console.error("Error fetching images from Drive:", error)
+    return c.json({ 
+      error: error?.message || "Unknown error",
+      message: "Failed to fetch images from Google Drive"
+    }, 500)
+  }
+})
+
+driveImageApp.get('/folder/:folderId/count', async (c) => {
+  try {
+    const folderId = c.req.param('folderId')
+    const drive = getAuthenticatedDrive()
+    const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`
+
+    let total = 0
+    let nextToken: string | undefined
+
+    let listRes = await drive.files.list({
+      q,
+      fields: "nextPageToken, files(id)",
+      pageSize: 1000,
+    })
+
+    total += listRes.data.files?.length ?? 0
+    nextToken = listRes.data.nextPageToken ?? undefined
+
+    while (nextToken) {
+      listRes = await drive.files.list({
+        q,
+        fields: "nextPageToken, files(id)",
+        pageSize: 1000,
+        pageToken: nextToken,
+      })
+      total += listRes.data.files?.length ?? 0
+      nextToken = listRes.data.nextPageToken ?? undefined
+    }
+
+    return c.json({ data: { count: total }, message: "" })
+  } catch (error: any) {
+    console.error("Error counting images:", error)
+    return c.json({ 
+      error: error?.message || "Unknown error",
+      message: "Failed to count images"
+    }, 500)
+  }
+})
+
 driveImageApp.get('/:id', async (c) => {
   const id = c.req.param('id')
   const name = c.req.query('name') || "image.jpg"
@@ -63,7 +148,7 @@ driveImageApp.get('/:id', async (c) => {
       c.header("Content-Type", memoryCached.contentType);
       c.header("Content-Length", memoryCached.data.byteLength.toString());
       c.header("X-Cache", "HIT-RAM");
-      return c.body(memoryCached.data.buffer.slice(memoryCached.data.byteOffset, memoryCached.data.byteOffset + memoryCached.data.byteLength));
+      return c.body(memoryCached.data.buffer.slice(memoryCached.data.byteOffset, memoryCached.data.byteOffset + memoryCached.data.byteLength) as any);
     }
 
     // 2. Check Disk Cache
@@ -81,7 +166,7 @@ driveImageApp.get('/:id', async (c) => {
 
           // @ts-ignore Hono supports Node streams with a little cast or standard Web Streams
           const webStream = Readable.toWeb(fileStream);
-          return c.body(webStream);
+          return c.body(webStream as any);
         }
       } catch (e) {
         console.error("Disk cache read error:", e);
@@ -146,7 +231,7 @@ driveImageApp.get('/:id', async (c) => {
       }
     });
 
-    return c.body(stream);
+    return c.body(stream as any);
 
   } catch (error: any) {
     console.error("Error serving Drive image:", error?.message || error);
@@ -154,6 +239,7 @@ driveImageApp.get('/:id', async (c) => {
     return c.text("Error serving image", 500);
   }
 })
+
 
 // Optional: route to clear cache
 driveImageApp.post('/clear-cache', (c) => {

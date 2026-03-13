@@ -1,6 +1,5 @@
 import { X } from "lucide-react";
 import EventForm from "./EventForm";
-import QRCodeManager from "./QRCodeManager";
 import { useEffect, useState, useRef } from "react";
 import Button from "../ui/Button";
 import { Heading, Text } from "../ui/Typography";
@@ -17,6 +16,8 @@ interface EventData {
   googleLink?: string;
   googleFolderLink?: string;
   driveLink: string;
+  isFaceSearchEnabled?: boolean;
+  isPaginationEnabled?: boolean;
 }
 
 export default function EventDrawer({
@@ -29,7 +30,6 @@ export default function EventDrawer({
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<"details" | "qrcode">("details");
   const formRef = useRef<HTMLFormElement>(null);
 
   const isEditMode = !!eventId;
@@ -53,10 +53,8 @@ export default function EventDrawer({
         }
       };
       fetchEvent();
-    } else {
       setInitialData(null);
       setError("");
-      setActiveTab("details");
     }
   }, [isOpen, eventId, isEditMode]);
 
@@ -95,8 +93,7 @@ export default function EventDrawer({
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[60] transition-opacity animate-in fade-in duration-300"
-        onClick={onClose}
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-60 transition-opacity animate-in fade-in duration-300"
       />
 
       {/* Responsive Panel */}
@@ -107,7 +104,14 @@ export default function EventDrawer({
             <Heading as="h5" className="text-neutral-900 dark:text-[#c0caf5]">
               {isEditMode ? "แก้ไข Event" : "เพิ่ม Event ใหม่"}
             </Heading>
-            <Text className="text-xs text-neutral-500 dark:text-[#565f89]">ระบุรายละเอียดกิจกรรมและลิงก์เชื่อมโยง</Text>
+            {isEditMode && eventId ? (
+              <div className="flex items-center gap-2 mt-1">
+                <Text className="text-xs text-neutral-500 dark:text-[#565f89] uppercase tracking-wider font-semibold">Event ID:</Text>
+                <Text className="text-xs font-mono text-neutral-600 dark:text-[#a9b1d6]">{eventId}</Text>
+              </div>
+            ) : (
+              <Text className="text-xs text-neutral-500 dark:text-[#565f89] mt-1">ระบุรายละเอียดกิจกรรมและลิงก์เชื่อมโยง</Text>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -133,44 +137,14 @@ export default function EventDrawer({
             <div className="space-y-6">
               {isEditMode && initialData && (
                 <div className="w-full">
-                  {/* Custom Tab List */}
-                  <div className="flex gap-1 mb-6 border-b border-neutral-200 dark:border-[#292e42]">
-                    <button
-                      onClick={() => setActiveTab("details")}
-                      className={`px-5 py-2.5 text-sm font-semibold transition-all border-b-2 ${
-                        activeTab === "details"
-                          ? "text-violet-600 dark:text-[#7aa2f7] border-violet-600 dark:border-[#7aa2f7]"
-                          : "text-neutral-500 dark:text-[#565f89] border-transparent hover:text-neutral-700 dark:hover:text-[#a9b1d6]"
-                      }`}
-                    >
-                      ข้อมูลทั่วไป
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("qrcode")}
-                      className={`px-5 py-2.5 text-sm font-semibold transition-all border-b-2 ${
-                        activeTab === "qrcode"
-                          ? "text-violet-600 dark:text-[#7aa2f7] border-violet-600 dark:border-[#7aa2f7]"
-                          : "text-neutral-500 dark:text-[#565f89] border-transparent hover:text-neutral-700 dark:hover:text-[#a9b1d6]"
-                      }`}
-                    >
-                      QR Code
-                    </button>
-                  </div>
-
-                  {activeTab === "details" ? (
-                    <EventForm
-                      initialData={initialData}
-                      eventId={eventId}
-                      onSuccess={onSuccess}
-                      onFormRef={(ref) => (formRef.current = ref)}
-                      onSubmittingChange={setIsSubmitting}
-                    />
-                  ) : (
-                    <QRCodeManager
-                      eventId={eventId}
-                      driveLink={initialData.driveLink}
-                    />
-                  )}
+                  {/* Form */}
+                  <EventForm
+                    initialData={initialData}
+                    eventId={eventId}
+                    onSuccess={onSuccess}
+                    onFormRef={(ref) => (formRef.current = ref)}
+                    onSubmittingChange={setIsSubmitting}
+                  />
                 </div>
               )}
               {!isEditMode && (

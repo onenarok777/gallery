@@ -1,4 +1,4 @@
-import { X, Download, Save, Palette, Image as ImageIcon, Upload, Loader2, AlertCircle } from "lucide-react";
+import { X, Download, Save, Palette, Image as ImageIcon, Upload, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Button from "../ui/Button";
 import { Heading, Text } from "../ui/Typography";
@@ -22,6 +22,7 @@ export default function QRCodeDrawer({
 }: QRCodeDrawerProps) {
   const [fgColor, setFgColor] = useState("#000000");
   const [bgColor, setBgColor] = useState("#ffffff");
+  const [qrMargin, setQrMargin] = useState(2);
 
   // URL ที่บันทึกใน DB (จาก R2)
   const [savedLogoUrl, setSavedLogoUrl] = useState<string | null>(null);
@@ -116,29 +117,72 @@ export default function QRCodeDrawer({
   };
 
   // ── Download QR ──────────────────────────────────────────────────────────
-  const downloadQRCode = () => {
+  const downloadQRCode = async () => {
     if (!qrRef.current) return;
     const svgData = new XMLSerializer().serializeToString(qrRef.current);
+    // Remove embedded image from SVG string to ensure safe parsing
+    const safeSvgData = svgData.replace(/<image[^>]*><\/image>|<image[^>]*\/>/g, "");
+
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
-    const img = new Image();
+    if (!ctx) return;
 
-    img.onload = () => {
-      canvas.width = 1024;
-      canvas.height = 1024;
-      if (ctx) {
+    // Calculate total canvas size including margin
+    const qrContentSize = 1024;
+    const marginPx = Math.round((qrMargin / 240) * qrContentSize);
+    const totalSize = qrContentSize + marginPx * 2;
+    canvas.width = totalSize;
+    canvas.height = totalSize;
+
+    const img = new Image();
+    
+    const svgPromise = new Promise((resolve) => {
+      img.onload = () => {
         ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, 1024, 1024);
-        const pngFile = canvas.toDataURL("image/png");
-        const downloadLink = document.createElement("a");
-        downloadLink.download = `QR-${eventTitle}.png`;
-        downloadLink.href = pngFile;
-        downloadLink.click();
+        ctx.fillRect(0, 0, totalSize, totalSize);
+        ctx.drawImage(img, marginPx, marginPx, qrContentSize, qrContentSize);
+        resolve(true);
+      };
+      img.onerror = () => resolve(false);
+      img.crossOrigin = "anonymous";
+      img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(safeSvgData)));
+    });
+
+    await svgPromise;
+
+    if (includeImage && qrLogoUrl) {
+      const logoImg = new Image();
+      logoImg.crossOrigin = "anonymous";
+      
+      const logoPromise = new Promise((resolve) => {
+        logoImg.onload = () => resolve(true);
+        logoImg.onerror = () => resolve(false);
+        logoImg.src = qrLogoUrl;
+      });
+
+      const loaded = await logoPromise;
+      if (loaded) {
+        // qrcode.react settings: size 240, logo size 50. 
+        // We map these to the 1024px canvas scale, offset by margin.
+        const logoSize = (50 / 240) * qrContentSize; 
+        const offset = marginPx + (qrContentSize - logoSize) / 2;
+        
+        ctx.fillStyle = bgColor;
+        ctx.fillRect(offset, offset, logoSize, logoSize);
+        ctx.drawImage(logoImg, offset, offset, logoSize, logoSize);
       }
-    };
-    img.crossOrigin = "anonymous";
-    img.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
+    }
+
+    try {
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `QR-${eventTitle}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    } catch (err) {
+      console.error("Failed to export canvas", err);
+      alert.error("ดาวน์โหลดไม่สำเร็จ", "มีปัญหาการสร้างรูปภาพจากเซิร์ฟเวอร์ (CORS)");
+    }
   };
 
   // ── Save: ใช้ FormData ส่งไปยัง /api/qr-code/:eventId ────────────────────
@@ -216,7 +260,7 @@ export default function QRCodeDrawer({
         </div>
 
         {/* Content */}
-        <div className="grow overflow-y-auto p-8 space-y-10">
+        <div className="grow overflow-y-auto p-5 space-y-6">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-40 gap-4">
                <Loader2 size={32} className="animate-spin text-violet-500" />
@@ -226,12 +270,13 @@ export default function QRCodeDrawer({
             <>
               {/* QR Preview Section */}
               <div className="flex flex-col items-center">
-                <div className="p-8 bg-white rounded-lg shadow-2xl shadow-indigo-500/10 ring-1 ring-neutral-100 dark:ring-white/5 animate-in zoom-in duration-700">
+                <div className="animate-in zoom-in duration-700">
                    <QRCodeSVG
                     value={eventLink}
                     size={240}
                     level="H"
                     includeMargin={false}
+                    marginSize={qrMargin}
                     imageSettings={includeImage && qrLogoUrl ? {
                         src: qrLogoUrl,
                         x: undefined,
@@ -292,6 +337,26 @@ export default function QRCodeDrawer({
                             <Text className="text-sm font-mono uppercase">{bgColor}</Text>
                         </div>
                      </div>
+                </div>
+
+                <div className="space-y-2">
+                   <div className="flex items-center justify-between">
+                     <Text className="text-xs font-bold text-neutral-500 dark:text-[#565f89]">ระยะขอบ (Margin)</Text>
+                     <Text className="text-xs font-mono text-neutral-400 dark:text-[#565f89]">{qrMargin}px</Text>
+                   </div>
+                   <input
+                     type="range"
+                     min={0}
+                     max={40}
+                     step={1}
+                     value={qrMargin}
+                     onChange={(e) => setQrMargin(Number(e.target.value))}
+                     className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-violet-600 bg-neutral-200 dark:bg-[#292e42]"
+                   />
+                   <div className="flex justify-between text-[10px] text-neutral-400 dark:text-[#565f89]">
+                     <span>ไม่มีขอบ</span>
+                     <span>กว้าง</span>
+                   </div>
                 </div>
 
                 <div className="space-y-4">
@@ -385,13 +450,26 @@ export default function QRCodeDrawer({
           <Button variant="secondary" onClick={onClose}>
             ยกเลิก
           </Button>
+          <Button variant="secondary" onClick={() => {
+            setFgColor("#000000");
+            setBgColor("#ffffff");
+            setQrMargin(2);
+            setIncludeImage(false);
+            setPendingFile(null);
+            if (localPreviewUrl) {
+              URL.revokeObjectURL(localPreviewUrl);
+              setLocalPreviewUrl(null);
+            }
+          }}>
+            <RotateCcw size={16} className="mr-2" /> รีเซ็ต
+          </Button>
           <Button onClick={handleSave} loading={isSaving} disabled={isLoading}>
             <Save size={16} className="mr-2" />
             {isSaving
               ? pendingFile
                 ? "กำลังอัปโหลด..."
                 : "กำลังบันทึก..."
-              : "บันทึกการเปลี่ยนแปลง"}
+              : "บันทึก"}
           </Button>
         </div>
       </div>

@@ -1,120 +1,118 @@
 "use server";
 
-import { getAuthenticatedDrive } from "@/lib/google-auth";
-
 import { unstable_cache } from "next/cache";
 
-// Internal fetcher function
-async function fetchDriveImages(pageToken?: string) {
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+// ============================================================================
+// Types
+// ============================================================================
 
-  if (!folderId) {
-    console.error("Missing GOOGLE_DRIVE_FOLDER_ID");
-    return { images: [], error: "Missing Folder ID" };
-  }
+interface DriveImage {
+  id: string;
+  name: string;
+  src: string;
+  originalSrc: string;
+  mimeType: string;
+  width?: number;
+  height?: number;
+}
 
+interface DriveImagesResult {
+  images: DriveImage[];
+  nextPageToken?: string;
+  error?: string;
+}
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+// ============================================================================
+// Internal Fetcher
+// ============================================================================
+
+async function fetchDriveImages(
+  folderId: string,
+  pageToken?: string
+): Promise<DriveImagesResult> {
   try {
-    const drive = getAuthenticatedDrive();
-
-    const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
-
-    const response: any = await drive.files.list({
-      q,
-      fields: "nextPageToken, files(id, name, mimeType, imageMediaMetadata, thumbnailLink)",
-      orderBy: "modifiedTime desc", // Newest first
-      pageSize: 50, // Load 50 at a time for infinite scroll
-      pageToken: pageToken,
-    });
-
-    const files = response.data.files;
-    const nextPageToken = response.data.nextPageToken;
-
-    if (!files) return { images: [], nextPageToken: undefined };
-
-    // Use original images for everything (cached on Vercel Edge CDN)
-    const images = files.map((file: any) => {
-      const imageSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`;
-      
-      return {
-        id: file.id,
-        name: file.name,
-        src: imageSrc,             // Grid uses original
-        originalSrc: imageSrc,     // Lightbox uses original
-        mimeType: file.mimeType,
-        width: file.imageMediaMetadata?.width,
-        height: file.imageMediaMetadata?.height,
-      };
+    const url = new URL(`${API_URL}/api/drive-image/folder/${folderId}/images`);
+    if (pageToken) {
+      url.searchParams.set("pageToken", pageToken);
+    }
+    const res = await fetch(url.toString(), {
+      next: { revalidate: 0 } // Cache is managed by unstable_cache for first page
     });
     
-    return { images, nextPageToken };
-
-  } catch (error: any) {
-    console.error("Error fetching images from Drive:", error?.message || error);
-    return { images: [], error: error?.message || "Unknown error" };
+    if (!res.ok) {
+      throw new Error(`Failed to fetch images from API: ${res.statusText}`);
+    }
+    
+    const data = await res.json();
+    if (data.error) {
+       throw new Error(data.error);
+    }
+    return data.data;
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Error fetching images from API:", message);
+    return { images: [], error: message };
   }
 }
 
-// Exported cached version
-export async function getDriveImages(pageToken?: string) {
-  // Only cache the first page (initial load)
-  // Pagination usually implies user interaction, so fresh data is fine, 
-  // but caching page 1 is critical for initial render performance.
+// ============================================================================
+// Exported Functions
+// ============================================================================
+
+/**
+ * Get images from a Google Drive folder.
+ * First page is cached per folderId, subsequent pages are fetched fresh.
+ */
+export async function getDriveImages(
+  folderId: string,
+  pageToken?: string
+): Promise<DriveImagesResult> {
+  // Only cache the first page (critical for initial render performance)
   if (!pageToken) {
     return unstable_cache(
-      async () => fetchDriveImages(pageToken),
-      ['gallery-images-first-page'], 
-      { 
-        tags: ['gallery-images'],
-        revalidate: 3600 // Fallback revalidate every hour
-      } 
+      () => fetchDriveImages(folderId),
+      [`gallery-images-${folderId}`],
+      {
+        tags: ["gallery-images"],
+        revalidate: 3600,
+      }
     )();
   }
-  
-  // Subsequent pages are not cached heavily or use short cache
-  return fetchDriveImages(pageToken);
+
+  return fetchDriveImages(folderId, pageToken);
 }
 
-// Simple in-memory cache for total count
-let cachedTotalCount: number | null = null;
-let lastCountTime = 0;
+/**
+ * Count total images in a Google Drive folder.
+ * Uses simple in-memory cache with 1-hour TTL per folderId.
+ */
+const countCache = new Map<string, { count: number; time: number }>();
 const COUNT_CACHE_TTL = 3600 * 1000; // 1 hour
 
-export async function getTotalImageCount() {
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
-
-  if (!folderId) return 0;
-
-  // Use cache if available and fresh
-  if (cachedTotalCount !== null && (Date.now() - lastCountTime < COUNT_CACHE_TTL)) {
-    return cachedTotalCount;
+export async function getTotalImageCount(folderId: string): Promise<number> {
+  // Check cache
+  const cached = countCache.get(folderId);
+  if (cached && Date.now() - cached.time < COUNT_CACHE_TTL) {
+    return cached.count;
   }
 
   try {
-    const drive = getAuthenticatedDrive();
-    const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`;
+    const res = await fetch(`${API_URL}/api/drive-image/folder/${folderId}/count`);
+    if (!res.ok) {
+      throw new Error(`Failed to count images: ${res.statusText}`);
+    }
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
     
-    let total = 0;
-    let pageToken: string | undefined = undefined;
-
-    do {
-      const response: any = await drive.files.list({
-        q,
-        fields: "nextPageToken, files(id)", // Only fetch IDs for speed
-        pageSize: 1000, // Max page size for faster counting
-        pageToken: pageToken,
-      });
-
-      const files = response.data.files;
-      if (files) {
-        total += files.length;
-      }
-      pageToken = response.data.nextPageToken;
-    } while (pageToken);
-
-    // Update cache
-    cachedTotalCount = total;
-    lastCountTime = Date.now();
-
+    const total = data.data?.count || 0;
+    countCache.set(folderId, { count: total, time: Date.now() });
     return total;
   } catch (error) {
     console.error("Error counting images:", error);

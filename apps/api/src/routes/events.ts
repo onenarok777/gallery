@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import { db } from '../db';
 import { events } from '../db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { Snowflake } from '../lib/snowflake';
 import { extractFolderId, isFolderPublic } from '../lib/drive-validator';
-import { successResponse, errorResponse } from '../lib/response';
+import { successResponse, errorResponse, paginatedResponse } from '../lib/response';
 
 const app = new Hono();
 
@@ -15,22 +15,35 @@ import { qrSettings } from '../db/schema';
 
 app.get('/', async (c) => {
   try {
+    const page = Math.max(1, Number(c.req.query('page') || '1'));
+    const pageSize = Math.min(100, Math.max(1, Number(c.req.query('page_size') || '20')));
+    const offset = (page - 1) * pageSize;
+
+    // Count total
+    const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(events);
+    const total = Number(count);
+    const totalPage = Math.ceil(total / pageSize);
+
+    // Fetch paginated
     const allEvents = await db
       .select()
       .from(events)
       .leftJoin(qrSettings, eq(events.id, qrSettings.eventId))
-      .orderBy(desc(events.createdAt));
+      .orderBy(desc(events.createdAt))
+      .limit(pageSize)
+      .offset(offset);
     
-    // Flatten the result to match the expected format if needed, 
-    // or keep it nested. Let's flatten for compatibility but 
-    // include settings as a sub-object if possible.
-    // For simplicity, let's map it:
     const formatted = allEvents.map(({ events, qr_settings }) => ({
       ...events,
       qrSettings: qr_settings
     }));
 
-    return successResponse(c, formatted);
+    return paginatedResponse(c, formatted, {
+      page,
+      page_size: pageSize,
+      total_page: totalPage,
+      total,
+    });
   } catch (error: any) {
     return errorResponse(c, error.message, 500);
   }
@@ -63,7 +76,7 @@ app.get('/:id', async (c) => {
 app.post('/', async (c) => {
   try {
     const body = await c.req.json();
-    const { title, googleFolderLink } = body;
+    const { title, googleFolderLink, isFaceSearchEnabled, isPaginationEnabled } = body;
     
     if (!title) {
       return errorResponse(c, 'ชื่องานเป็นสิ่งจำเป็น', 400);
@@ -92,7 +105,9 @@ app.post('/', async (c) => {
     const [newEvent] = await db.insert(events).values({ 
       id,
       title, 
-      driveLink: googleFolderLink
+      driveLink: googleFolderLink,
+      isFaceSearchEnabled: isFaceSearchEnabled !== undefined ? isFaceSearchEnabled : true,
+      isPaginationEnabled: isPaginationEnabled !== undefined ? isPaginationEnabled : false,
     }).returning();
 
     // Initialize QR settings
@@ -110,7 +125,15 @@ app.put('/:id', async (c) => {
   try {
     const id = c.req.param('id');
     const body = await c.req.json();
-    const { title, googleFolderLink, qrLogoUrl, qrFgColor, qrBgColor } = body;
+    const { 
+      title, 
+      googleFolderLink, 
+      qrLogoUrl, 
+      qrFgColor, 
+      qrBgColor,
+      isFaceSearchEnabled,
+      isPaginationEnabled
+    } = body;
     
     // Update Event Table
     const eventUpdate: any = { updatedAt: new Date() };
@@ -121,6 +144,8 @@ app.put('/:id', async (c) => {
         eventUpdate.driveLink = googleFolderLink;
       }
     }
+    if (isFaceSearchEnabled !== undefined) eventUpdate.isFaceSearchEnabled = isFaceSearchEnabled;
+    if (isPaginationEnabled !== undefined) eventUpdate.isPaginationEnabled = isPaginationEnabled;
 
     if (Object.keys(eventUpdate).length > 1) {
       await db.update(events).set(eventUpdate).where(eq(events.id, id));

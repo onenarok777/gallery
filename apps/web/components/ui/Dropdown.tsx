@@ -115,6 +115,9 @@ export default function Dropdown({
       <div 
         onClick={(e) => {
           e.stopPropagation();
+          if (!isOpen) {
+            updateCoords();
+          }
           setIsOpen(!isOpen);
         }}
       >

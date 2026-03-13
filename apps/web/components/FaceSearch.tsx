@@ -113,7 +113,8 @@ export default function FaceSearch({
       formData.append("threshold", threshold.toString());
       formData.append("limit", "30");
 
-      const response = await fetch("/api/face-search", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const response = await fetch(`${apiUrl}/api/face-search`, {
         method: "POST",
         body: formData,
       });
