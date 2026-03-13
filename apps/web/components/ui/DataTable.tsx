@@ -39,23 +39,6 @@ export default function DataTable<T extends { id: string | number }>({
 }: DataTableProps<T>) {
   return (
     <div className="space-y-4">
-      {pagination && (
-        <div className="flex items-center justify-between mb-4">
-          <Text className="text-xs text-neutral-400 dark:text-[#565f89] font-semibold">
-            แสดง {data.length}{pagination.total !== undefined ? ` จาก ${pagination.total}` : ''} รายการ
-          </Text>
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            onPageChange={pagination.onPageChange}
-            disabled={isLoading}
-            pageSize={pagination.pageSize}
-            pageSizeOptions={pagination.pageSizeOptions}
-            onPageSizeChange={pagination.onPageSizeChange}
-          />
-        </div>
-      )}
-
       <div className="overflow-hidden rounded-lg border border-neutral-100 dark:border-[#292e42] bg-white dark:bg-[#1a1b26] shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -120,8 +103,8 @@ export default function DataTable<T extends { id: string | number }>({
       </div>
 
       {pagination && (
-        <div className="flex items-center justify-between">
-          <Text className="text-xs text-neutral-400 dark:text-[#565f89] font-semibold">
+        <div className="flex flex-row items-center justify-between gap-4">
+          <Text className="text-xs text-neutral-400 dark:text-[#565f89] font-semibold whitespace-nowrap">
             แสดง {data.length}{pagination.total !== undefined ? ` จาก ${pagination.total}` : ''} รายการ
           </Text>
           <Pagination
