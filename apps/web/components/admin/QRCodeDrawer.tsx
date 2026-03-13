@@ -243,18 +243,18 @@ export default function QRCodeDrawer({
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-[60] transition-opacity animate-in fade-in duration-300"
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-60 transition-opacity animate-in fade-in duration-300"
         onClick={onClose}
       />
 
-      <div className="fixed z-[70] top-0 bottom-0 left-0 right-0 h-screen md:left-auto md:right-0 md:w-full md:max-w-xl bg-white dark:bg-[#1a1b26] border-l border-neutral-200 dark:border-[#292e42] shadow-2xl transition-all animate-in slide-in-from-right duration-500 flex flex-col overflow-hidden">
+      <div className="fixed z-70 top-0 bottom-0 left-0 right-0 h-screen md:left-auto md:right-0 md:w-full md:max-w-xl bg-white dark:bg-admin-surface border-l border-neutral-200 dark:border-admin-border shadow-2xl transition-all animate-in slide-in-from-right duration-500 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-neutral-100 dark:border-[#292e42] flex items-center justify-between shrink-0">
+        <div className="px-6 py-5 border-b border-neutral-100 dark:border-admin-border flex items-center justify-between shrink-0">
           <div>
             <Heading as="h5">จัดการ QR Code</Heading>
-            <Text className="text-xs text-neutral-500 dark:text-[#565f89]">{eventTitle}</Text>
+            <Text className="text-xs text-neutral-500 dark:text-admin-text-dim">{eventTitle}</Text>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-neutral-100 dark:hover:bg-[#1f2335] rounded-full transition-colors text-neutral-400 dark:text-[#565f89]">
+          <button onClick={onClose} className="p-2 hover:bg-neutral-100 dark:hover:bg-admin-surface-hover rounded-full transition-colors text-neutral-400 dark:text-admin-text-dim">
             <X size={20} />
           </button>
         </div>
@@ -292,8 +292,8 @@ export default function QRCodeDrawer({
                   />
                 </div>
                 <div className="mt-8 flex flex-col items-center text-center px-4">
-                   <Text className="text-sm font-bold text-neutral-900 dark:text-[#c0caf5] mb-1">สแกนเพื่อเข้าสู่หน้างาน</Text>
-                   <Text className="text-xs text-neutral-400 dark:text-[#565f89] break-all max-w-[320px]">
+                   <Text className="text-sm font-bold text-neutral-900 dark:text-admin-text mb-1">สแกนเพื่อเข้าสู่หน้างาน</Text>
+                   <Text className="text-xs text-neutral-400 dark:text-admin-text-dim break-all max-w-[320px]">
                      {eventLink}
                    </Text>
                 </div>
@@ -303,7 +303,7 @@ export default function QRCodeDrawer({
                 </Button>
               </div>
 
-              <div className="h-px bg-neutral-100 dark:bg-[#292e42]" />
+              <div className="h-px bg-neutral-100 dark:bg-admin-border" />
 
               {/* Customization Section */}
               <div className="space-y-8">
@@ -314,8 +314,8 @@ export default function QRCodeDrawer({
 
                 <div className="grid grid-cols-2 gap-6">
                      <div className="space-y-2">
-                        <Text className="text-xs font-bold text-neutral-500 dark:text-[#565f89]">สีของรหัส (Foreground)</Text>
-                        <div className="flex items-center gap-3 p-2 rounded-lg border border-neutral-100 dark:border-[#292e42] bg-neutral-50/50 dark:bg-[#1f2335]">
+                        <Text className="text-xs font-bold text-neutral-500 dark:text-admin-text-dim">สีของรหัส (Foreground)</Text>
+                        <div className="flex items-center gap-3 p-2 rounded-lg border border-neutral-100 dark:border-admin-border bg-neutral-50/50 dark:bg-admin-surface-hover">
                             <input
                                 type="color"
                                 value={fgColor}
@@ -326,8 +326,8 @@ export default function QRCodeDrawer({
                         </div>
                      </div>
                      <div className="space-y-2">
-                        <Text className="text-xs font-bold text-neutral-500 dark:text-[#565f89]">สีพื้นหลัง (Background)</Text>
-                        <div className="flex items-center gap-3 p-2 rounded-lg border border-neutral-100 dark:border-[#292e42] bg-neutral-50/50 dark:bg-[#1f2335]">
+                        <Text className="text-xs font-bold text-neutral-500 dark:text-admin-text-dim">สีพื้นหลัง (Background)</Text>
+                        <div className="flex items-center gap-3 p-2 rounded-lg border border-neutral-100 dark:border-admin-border bg-neutral-50/50 dark:bg-admin-surface-hover">
                             <input
                                 type="color"
                                 value={bgColor}
@@ -341,8 +341,8 @@ export default function QRCodeDrawer({
 
                 <div className="space-y-2">
                    <div className="flex items-center justify-between">
-                     <Text className="text-xs font-bold text-neutral-500 dark:text-[#565f89]">ระยะขอบ (Margin)</Text>
-                     <Text className="text-xs font-mono text-neutral-400 dark:text-[#565f89]">{qrMargin}px</Text>
+                     <Text className="text-xs font-bold text-neutral-500 dark:text-admin-text-dim">ระยะขอบ (Margin)</Text>
+                     <Text className="text-xs font-mono text-neutral-400 dark:text-admin-text-dim">{qrMargin}px</Text>
                    </div>
                    <input
                      type="range"
@@ -351,9 +351,9 @@ export default function QRCodeDrawer({
                      step={1}
                      value={qrMargin}
                      onChange={(e) => setQrMargin(Number(e.target.value))}
-                     className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-violet-600 bg-neutral-200 dark:bg-[#292e42]"
+                     className="w-full h-2 rounded-lg appearance-none cursor-pointer accent-violet-600 bg-neutral-200 dark:bg-admin-border"
                    />
-                   <div className="flex justify-between text-[10px] text-neutral-400 dark:text-[#565f89]">
+                   <div className="flex justify-between text-[10px] text-neutral-400 dark:text-admin-text-dim">
                      <span>ไม่มีขอบ</span>
                      <span>กว้าง</span>
                    </div>
@@ -362,12 +362,12 @@ export default function QRCodeDrawer({
                 <div className="space-y-4">
                    <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-[#24283b] flex items-center justify-center shadow-sm text-violet-600 dark:text-[#7aa2f7]">
+                            <div className="w-10 h-10 rounded-lg bg-white dark:bg-admin-surface-muted flex items-center justify-center shadow-sm text-violet-600 dark:text-[#7aa2f7]">
                                 <ImageIcon size={20} />
                             </div>
                             <div>
-                                <Text className="text-sm font-bold text-neutral-900 dark:text-[#c0caf5]">ใส่โลโก้ตรงกลาง</Text>
-                                <Text className="text-[10px] text-neutral-400 dark:text-[#565f89]">แสดงโลโก้ธุรกิจของคุณที่จุดศูนย์กลาง</Text>
+                                <Text className="text-sm font-bold text-neutral-900 dark:text-admin-text">ใส่โลโก้ตรงกลาง</Text>
+                                <Text className="text-[10px] text-neutral-400 dark:text-admin-text-dim">แสดงโลโก้ธุรกิจของคุณที่จุดศูนย์กลาง</Text>
                             </div>
                         </div>
                         <input
@@ -380,7 +380,7 @@ export default function QRCodeDrawer({
                    </div>
 
                    <div
-                      className="relative p-6 rounded-lg border-2 border-dashed border-neutral-200 dark:border-[#292e42] hover:border-violet-400 dark:hover:border-violet-500 transition-colors flex flex-col items-center justify-center gap-3 cursor-pointer group"
+                      className="relative p-6 rounded-lg border-2 border-dashed border-neutral-200 dark:border-admin-border hover:border-violet-400 dark:hover:border-violet-500 transition-colors flex flex-col items-center justify-center gap-3 cursor-pointer group"
                       onClick={() => fileInputRef.current?.click()}
                    >
                      <input
@@ -424,8 +424,8 @@ export default function QRCodeDrawer({
                             <Upload size={18} />
                           </div>
                           <div className="text-center">
-                            <Text className="text-xs font-bold text-neutral-900 dark:text-[#c0caf5]">คลิกเพื่อเพิ่มโลโก้</Text>
-                            <Text className="text-[10px] text-neutral-400 dark:text-[#565f89]">PNG, JPG, SVG ขนาดไม่เกิน 5MB</Text>
+                            <Text className="text-xs font-bold text-neutral-900 dark:text-admin-text">คลิกเพื่อเพิ่มโลโก้</Text>
+                            <Text className="text-[10px] text-neutral-400 dark:text-admin-text-dim">PNG, JPG, SVG ขนาดไม่เกิน 5MB</Text>
                           </div>
                         </>
                      )}
@@ -446,7 +446,7 @@ export default function QRCodeDrawer({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-neutral-100 dark:border-[#292e42] bg-neutral-50/50 dark:bg-[#1a1b26] shrink-0 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-neutral-100 dark:border-admin-border bg-neutral-50/50 dark:bg-admin-surface shrink-0 flex justify-end gap-3">
           <Button variant="secondary" onClick={onClose}>
             ยกเลิก
           </Button>

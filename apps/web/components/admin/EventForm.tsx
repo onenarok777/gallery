@@ -121,7 +121,7 @@ export default function EventForm({
           helperText="วางลิงก์โฟลเดอร์ Google Drive ที่เปิดสิทธิ์แชร์แล้ว"
         />
 
-        <div className="pt-4 border-t border-neutral-100 dark:border-[#292e42] space-y-5">
+        <div className="pt-4 border-t border-neutral-100 dark:border-admin-border space-y-5">
           <Switch
             checked={formData.isFaceSearchEnabled}
             onChange={(checked) => setFormData({ ...formData, isFaceSearchEnabled: checked })}

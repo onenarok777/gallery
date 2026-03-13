@@ -17,7 +17,7 @@ export const Heading = ({ children, className = "", as: Tag = "h1", ...props }: 
   };
 
   return (
-    <Tag className={`${sizes[Tag as keyof typeof sizes]} text-neutral-900 dark:text-[#c0caf5] ${className}`} {...props}>
+    <Tag className={`${sizes[Tag as keyof typeof sizes]} text-neutral-900 dark:text-admin-text ${className}`} {...props}>
       {children}
     </Tag>
   );
@@ -25,7 +25,7 @@ export const Heading = ({ children, className = "", as: Tag = "h1", ...props }: 
 
 export const Text = ({ children, className = "", as: Tag = "p", ...props }: TypographyProps) => {
   return (
-    <Tag className={`leading-relaxed text-neutral-600 dark:text-[#a9b1d6] ${className}`} {...props}>
+    <Tag className={`leading-relaxed text-neutral-600 dark:text-admin-text-muted ${className}`} {...props}>
       {children}
     </Tag>
   );

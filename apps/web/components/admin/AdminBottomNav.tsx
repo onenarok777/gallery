@@ -14,7 +14,7 @@ export default function AdminBottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-[#16161e]/90 backdrop-blur-xl border-t border-neutral-100 dark:border-[#292e42] px-2 pb-safe-area-inset-bottom shadow-[0_-1px_10px_rgba(0,0,0,0.02)]">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-admin-base/90 backdrop-blur-xl border-t border-neutral-100 dark:border-admin-border px-2 pb-safe-area-inset-bottom shadow-[0_-1px_10px_rgba(0,0,0,0.02)]">
       <div className="flex items-center justify-around h-16 max-w-md mx-auto relative">
         {NAV_ITEMS.map((item) => {
           const isActive =
@@ -29,7 +29,7 @@ export default function AdminBottomNav() {
               className={`relative flex flex-col items-center justify-center gap-1 w-full h-full transition-all duration-300 ${
                 isActive
                   ? "text-violet-600 dark:text-[#7aa2f7]"
-                  : "text-neutral-400 dark:text-[#565f89] hover:text-neutral-600 dark:hover:text-[#a9b1d6]"
+                  : "text-neutral-400 dark:text-admin-text-dim hover:text-neutral-600 dark:hover:text-admin-text-muted"
               }`}
             >
               <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} className="transition-transform duration-300 active:scale-90" />

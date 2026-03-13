@@ -97,25 +97,25 @@ export default function EventDrawer({
       />
 
       {/* Responsive Panel */}
-      <div className="fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-[#1a1b26] shadow-2xl z-[70] overflow-y-auto animate-in slide-in-from-right duration-500 rounded-l-lg border-l border-neutral-100 dark:border-[#292e42]">
+      <div className="fixed top-0 right-0 h-full w-full max-w-2xl bg-white dark:bg-admin-surface shadow-2xl z-70 overflow-y-auto animate-in slide-in-from-right duration-500 rounded-l-lg border-l border-neutral-100 dark:border-admin-border">
         {/* Header */}
-        <div className="px-6 py-5 border-b border-neutral-100 dark:border-[#292e42] flex items-center justify-between shrink-0">
+        <div className="px-6 py-5 border-b border-neutral-100 dark:border-admin-border flex items-center justify-between shrink-0">
           <div>
-            <Heading as="h5" className="text-neutral-900 dark:text-[#c0caf5]">
+            <Heading as="h5" className="text-neutral-900 dark:text-admin-text">
               {isEditMode ? "แก้ไข Event" : "เพิ่ม Event ใหม่"}
             </Heading>
             {isEditMode && eventId ? (
               <div className="flex items-center gap-2 mt-1">
-                <Text className="text-xs text-neutral-500 dark:text-[#565f89] uppercase tracking-wider font-semibold">Event ID:</Text>
-                <Text className="text-xs font-mono text-neutral-600 dark:text-[#a9b1d6]">{eventId}</Text>
+                <Text className="text-xs text-neutral-500 dark:text-admin-text-dim uppercase tracking-wider font-semibold">Event ID:</Text>
+                <Text className="text-xs font-mono text-neutral-600 dark:text-admin-text-muted">{eventId}</Text>
               </div>
             ) : (
-              <Text className="text-xs text-neutral-500 dark:text-[#565f89] mt-1">ระบุรายละเอียดกิจกรรมและลิงก์เชื่อมโยง</Text>
+              <Text className="text-xs text-neutral-500 dark:text-admin-text-dim mt-1">ระบุรายละเอียดกิจกรรมและลิงก์เชื่อมโยง</Text>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-neutral-100 dark:hover:bg-[#1f2335] rounded-full transition-colors text-neutral-400 dark:text-[#565f89]"
+            className="p-2 hover:bg-neutral-100 dark:hover:bg-admin-surface-hover rounded-full transition-colors text-neutral-400 dark:text-admin-text-dim"
           >
             <X size={20} />
           </button>
@@ -129,9 +129,9 @@ export default function EventDrawer({
             </div>
           ) : isLoading ? (
             <div className="space-y-6">
-               <div className="w-full h-8 bg-neutral-100 dark:bg-[#1f2335]/50 animate-pulse rounded-lg" />
-               <div className="w-full h-32 bg-neutral-100 dark:bg-[#1f2335]/50 animate-pulse rounded-lg" />
-               <div className="w-full h-32 bg-neutral-100 dark:bg-[#1f2335]/50 animate-pulse rounded-lg" />
+               <div className="w-full h-8 bg-neutral-100 dark:bg-admin-surface-hover/50 animate-pulse rounded-lg" />
+               <div className="w-full h-32 bg-neutral-100 dark:bg-admin-surface-hover/50 animate-pulse rounded-lg" />
+               <div className="w-full h-32 bg-neutral-100 dark:bg-admin-surface-hover/50 animate-pulse rounded-lg" />
             </div>
           ) : (
             <div className="space-y-6">
@@ -159,7 +159,7 @@ export default function EventDrawer({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-neutral-100 dark:border-[#292e42] bg-neutral-50/50 dark:bg-[#1a1b26] shrink-0 flex justify-end gap-3">
+        <div className="px-6 py-4 border-t border-neutral-100 dark:border-admin-border bg-neutral-50/50 dark:bg-admin-surface shrink-0 flex justify-end gap-3">
           <Button
             variant="secondary"
             onClick={onClose}

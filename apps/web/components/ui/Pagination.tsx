@@ -52,7 +52,7 @@ export default function Pagination({
       pages.push(renderPageButton(1));
       
       if (currentPage > 3) {
-        pages.push(<MoreHorizontal key="ellipsis-start" size={16} className="text-neutral-300 dark:text-[#292e42]" />);
+        pages.push(<MoreHorizontal key="ellipsis-start" size={16} className="text-neutral-300 dark:text-admin-border" />);
       }
 
       const start = Math.max(2, currentPage - 1);
@@ -63,7 +63,7 @@ export default function Pagination({
       }
 
       if (currentPage < safeTotalPages - 2) {
-        pages.push(<MoreHorizontal key="ellipsis-end" size={16} className="text-neutral-300 dark:text-[#292e42]" />);
+        pages.push(<MoreHorizontal key="ellipsis-end" size={16} className="text-neutral-300 dark:text-admin-border" />);
       }
 
       pages.push(renderPageButton(safeTotalPages));
@@ -80,7 +80,7 @@ export default function Pagination({
       className={`min-w-[36px] h-9 flex items-center justify-center rounded-lg text-sm font-semibold transition-all duration-200 ${
         currentPage === page
           ? "bg-violet-600 dark:bg-violet-500 text-white shadow-md shadow-violet-500/20"
-          : "text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white"
+          : "text-neutral-500 dark:text-admin-text-muted hover:bg-neutral-100 dark:hover:bg-admin-border hover:text-neutral-900 dark:hover:text-white"
       } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
     >
       {page}
@@ -93,7 +93,7 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1 || disabled}
-          className="p-2 rounded-lg text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="p-2 rounded-lg text-neutral-500 dark:text-admin-text-muted hover:bg-neutral-100 dark:hover:bg-admin-border hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         >
           <ChevronLeft size={18} />
         </button>
@@ -105,14 +105,14 @@ export default function Pagination({
         <button
           onClick={() => onPageChange(Math.min(safeTotalPages, currentPage + 1))}
           disabled={currentPage === safeTotalPages || disabled}
-          className="p-2 rounded-lg text-neutral-500 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+          className="p-2 rounded-lg text-neutral-500 dark:text-admin-text-muted hover:bg-neutral-100 dark:hover:bg-admin-border hover:text-neutral-900 dark:hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all"
         >
           <ChevronRight size={18} />
         </button>
       </div>
 
       {onPageSizeChange && pageSize && (
-        <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-[#a9b1d6]">
+        <div className="flex items-center gap-2 text-sm text-neutral-500 dark:text-admin-text-muted">
           <span className="hidden sm:inline-block">แสดงหน้าละ</span>
           <div className="relative" ref={dropdownRef}>
             <button
@@ -121,7 +121,7 @@ export default function Pagination({
               className={`h-9 px-3 flex items-center gap-2 rounded-lg border text-sm font-medium transition-all ${
                 isDropdownOpen
                   ? "border-violet-500 bg-violet-50/50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300"
-                  : "border-neutral-200 dark:border-[#292e42] bg-white dark:bg-[#1f2335] text-neutral-700 dark:text-[#c0caf5] hover:border-violet-300 dark:hover:border-violet-500/50"
+                  : "border-neutral-200 dark:border-admin-border bg-white dark:bg-admin-surface-hover text-neutral-700 dark:text-admin-text hover:border-violet-300 dark:hover:border-violet-500/50"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {pageSize}
@@ -134,7 +134,7 @@ export default function Pagination({
             </button>
 
             {isDropdownOpen && !disabled && (
-              <div className="absolute right-0 top-full mt-1.5 w-full min-w-[80px] z-50 py-1.5 rounded-lg border border-neutral-100 dark:border-[#292e42] bg-white dark:bg-[#1f2335] shadow-lg shadow-neutral-200/20 dark:shadow-none translate-y-0 opacity-100 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 top-full mt-1.5 w-full min-w-[80px] z-50 py-1.5 rounded-lg border border-neutral-100 dark:border-admin-border bg-white dark:bg-admin-surface-hover shadow-lg shadow-neutral-200/20 dark:shadow-none translate-y-0 opacity-100 animate-in fade-in slide-in-from-top-2 duration-200">
                 <div className="max-h-[200px] overflow-y-auto">
                   {pageSizeOptions.map((size) => (
                     <button
@@ -146,7 +146,7 @@ export default function Pagination({
                       className={`w-full px-3 py-1.5 text-left text-sm transition-colors ${
                         pageSize === size
                           ? "bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300 font-medium"
-                          : "text-neutral-600 dark:text-[#a9b1d6] hover:bg-neutral-50 dark:hover:bg-[#292e42] hover:text-neutral-900 dark:hover:text-white"
+                          : "text-neutral-600 dark:text-admin-text-muted hover:bg-neutral-50 dark:hover:bg-admin-border hover:text-neutral-900 dark:hover:text-white"
                       }`}
                     >
                       {size}

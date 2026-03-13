@@ -15,7 +15,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full space-y-1.5">
         {label && (
-          <label className="block text-sm font-semibold text-neutral-800 dark:text-[#c0caf5]">
+          <label className="block text-sm font-semibold text-neutral-800 dark:text-admin-text">
             {label} {props.required && <span className="text-red-500">*</span>}
           </label>
         )}
@@ -30,12 +30,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={`
-              w-full px-4 py-2.5 bg-white dark:bg-[#1a1b26] 
-              border border-neutral-200 dark:border-[#292e42] 
-              rounded-lg text-neutral-900 dark:text-[#c0caf5] 
-              placeholder:text-neutral-400 dark:placeholder:text-[#565f89]
+              w-full px-4 py-2.5 bg-white dark:bg-admin-surface 
+              border border-neutral-200 dark:border-admin-border 
+              rounded-lg text-neutral-900 dark:text-admin-text 
+              placeholder:text-neutral-400 dark:placeholder:text-admin-text-dim
               focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500
-              disabled:opacity-50 disabled:bg-neutral-50 dark:disabled:bg-[#1f2335]
+              disabled:opacity-50 disabled:bg-neutral-50 dark:disabled:bg-admin-surface-hover
               transition-all duration-200
               ${leftIcon ? "pl-11" : ""}
               ${rightIcon ? "pr-11" : ""}
@@ -57,7 +57,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {error}
           </p>
         ) : helperText ? (
-          <p className="text-xs text-neutral-500 dark:text-[#a9b1d6]">
+          <p className="text-xs text-neutral-500 dark:text-admin-text-muted">
             {helperText}
           </p>
         ) : null}

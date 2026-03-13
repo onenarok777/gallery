@@ -69,7 +69,7 @@ export default function AdminEventsPage() {
       className: "w-auto md:w-[70%]",
       render: (event) => (
         <div className="flex flex-col">
-          <Text className="font-bold text-neutral-900 dark:text-[#c0caf5]">
+          <Text className="font-bold text-neutral-900 dark:text-admin-text">
             {event.title}
           </Text>
           <a 
@@ -89,7 +89,7 @@ export default function AdminEventsPage() {
       headerClassName: "hidden md:table-cell w-[20%]",
       className: "hidden md:table-cell w-[20%]",
       render: (event) => (
-        <Text className="text-sm text-neutral-400 dark:text-[#565f89]">
+        <Text className="text-sm text-neutral-400 dark:text-admin-text-dim">
           {new Date(event.updatedAt).toLocaleDateString("th-TH", {
              year: "numeric",
              month: "short",
@@ -169,7 +169,7 @@ export default function AdminEventsPage() {
           <Heading as="h2" className="mb-2">
             Events List
           </Heading>
-          <Text className="text-neutral-500 dark:text-[#a9b1d6]">
+          <Text className="text-neutral-500 dark:text-admin-text-muted">
             จัดการข้อมูลกิจกรรมและการเข้าถึงทั้งหมด
           </Text>
         </div>

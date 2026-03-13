@@ -20,6 +20,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Admin Theme Colors */
+  --color-admin-base: #16161e;
+  --color-admin-surface: #1a1b26;
+  --color-admin-surface-hover: #1f2335;
+  --color-admin-surface-muted: #24283b;
+  --color-admin-border: #292e42;
+  --color-admin-text: #c0caf5;
+  --color-admin-text-muted: #a9b1d6;
+  --color-admin-text-dim: #565f89;
 }
 
 body {

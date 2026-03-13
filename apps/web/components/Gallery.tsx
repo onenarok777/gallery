@@ -341,7 +341,7 @@ export default function Gallery({
         </h1>
         <button
           onClick={() => setShowFaceSearch(true)}
-          className="mt-6 inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-medium text-sm shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-105 transition-all duration-200"
+          className="mt-6 inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-linear-to-r from-violet-500 to-pink-500 text-white font-medium text-sm shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-105 transition-all duration-200"
           id="face-search-btn"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -453,7 +453,7 @@ export default function Gallery({
 
       {/* Pagination UI */}
       {isPaginationEnabled && totalPages > 1 && (
-        <div className="w-full flex flex-col items-center gap-6 border-t border-neutral-100 dark:border-[#292e42] mt-8 pt-8">
+        <div className="w-full flex flex-col items-center gap-6 border-t border-neutral-100 dark:border-admin-border mt-8 pt-8">
           {(isLoadingToPage || loading) && (
              <div className="flex items-center gap-2 text-sm text-neutral-500">
                <svg className="animate-spin h-5 w-5 text-neutral-400"

@@ -51,7 +51,7 @@ export default function AdminNavbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between md:justify-end px-4 md:px-6 bg-white/80 dark:bg-[#1a1b2e]/80 backdrop-blur-md border-b border-neutral-200 dark:border-[#292e42]">
+    <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between md:justify-end px-4 md:px-6 bg-white/80 dark:bg-admin-surface/80 backdrop-blur-md border-b border-neutral-200 dark:border-admin-border">
       {/* Mobile Title */}
       <div className="md:hidden flex items-center">
         <span className="font-bold text-lg text-neutral-900 dark:text-white">
@@ -63,10 +63,10 @@ export default function AdminNavbar() {
       <div className="flex items-center gap-3 shrink-0">
         {loading ? (
           <div className="flex items-center gap-3 animate-pulse">
-            <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-[#292e42]"></div>
+            <div className="w-8 h-8 rounded-full bg-neutral-200 dark:bg-admin-border"></div>
             <div className="hidden sm:flex flex-col gap-1">
-              <div className="w-20 h-3 bg-neutral-200 dark:bg-[#292e42] rounded"></div>
-              <div className="w-32 h-3 bg-neutral-200 dark:bg-[#292e42] rounded"></div>
+              <div className="w-20 h-3 bg-neutral-200 dark:bg-admin-border rounded"></div>
+              <div className="w-32 h-3 bg-neutral-200 dark:bg-admin-border rounded"></div>
             </div>
           </div>
         ) : user ? (
@@ -75,7 +75,7 @@ export default function AdminNavbar() {
               <span className="text-sm font-medium text-neutral-900 dark:text-white leading-tight">
                 {user.name || "Administrator"}
               </span>
-              <span className="text-xs text-neutral-500 dark:text-[#a9b1d6]">
+              <span className="text-xs text-neutral-500 dark:text-admin-text-muted">
                 {user.email}
               </span>
             </div>
@@ -85,7 +85,7 @@ export default function AdminNavbar() {
                 alt={user.name || "User"}
                 width={36}
                 height={36}
-                className="w-9 h-9 rounded-full object-cover border border-neutral-200 dark:border-[#292e42] shadow-sm"
+                className="w-9 h-9 rounded-full object-cover border border-neutral-200 dark:border-admin-border shadow-sm"
               />
             ) : (
               <div className="w-9 h-9 rounded-full bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center border border-violet-200 dark:border-violet-800 shadow-sm">
@@ -94,7 +94,7 @@ export default function AdminNavbar() {
             )}
           </>
         ) : (
-          <div className="text-sm text-neutral-500 dark:text-[#a9b1d6]">
+          <div className="text-sm text-neutral-500 dark:text-admin-text-muted">
             Not logged in
           </div>
         )}

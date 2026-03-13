@@ -79,7 +79,7 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
         {/* Loading State Overlay */}
         {!isLoaded && !hasError && (
           <div className="absolute inset-0 z-10 bg-neutral-100 dark:bg-neutral-800 flex flex-col items-center justify-center">
-             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent dark:via-white/5 -translate-x-full animate-[shimmer_1.5s_infinite] pointer-events-none" />
+             <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent dark:via-white/5 -translate-x-full animate-[shimmer_1.5s_infinite] pointer-events-none" />
              
              <svg 
                className="w-8 h-8 text-neutral-300 dark:text-neutral-700 animate-pulse relative z-20" 

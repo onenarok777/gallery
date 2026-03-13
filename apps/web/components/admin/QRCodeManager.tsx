@@ -45,10 +45,10 @@ export default function QRCodeManager({
 
   return (
     <div
-      className="flex flex-col items-center gap-8 py-10 bg-neutral-50 dark:bg-[#1f2335]/50 rounded-lg border border-neutral-200/60 dark:border-[#292e42]/50 shadow-sm animate-in fade-in duration-500"
+      className="flex flex-col items-center gap-8 py-10 bg-neutral-50 dark:bg-admin-surface-hover/50 rounded-lg border border-neutral-200/60 dark:border-admin-border/50 shadow-sm animate-in fade-in duration-500"
     >
       <div
-        className="bg-white p-6 rounded-lg shadow-xl shadow-violet-500/5 border border-neutral-100 dark:border-none ring-4 ring-neutral-100/50 dark:ring-[#292e42]/30"
+        className="bg-white p-6 rounded-lg shadow-xl shadow-violet-500/5 border border-neutral-100 dark:border-none ring-4 ring-neutral-100/50 dark:ring-admin-border/30"
         ref={qrRef}
       >
         <QRCodeSVG
@@ -62,12 +62,12 @@ export default function QRCodeManager({
 
       <div className="flex flex-col items-center gap-3 px-6 text-center max-w-sm">
         <Text
-          className="text-lg font-bold text-neutral-900 dark:text-[#c0caf5]"
+          className="text-lg font-bold text-neutral-900 dark:text-admin-text"
         >
           ดาวน์โหลด QR Code สำหรับกิจกรรม
         </Text>
         <Text
-          className="text-sm text-neutral-500 dark:text-[#a9b1d6] leading-relaxed"
+          className="text-sm text-neutral-500 dark:text-admin-text-muted leading-relaxed"
         >
           คุณสามารถบันทึกภาพ QR Code นี้เป็นไฟล์ PNG 
           เพื่อให้ผู้ร่วมงานสแกนเพื่อเข้าถึง Google Drive ได้ทันที

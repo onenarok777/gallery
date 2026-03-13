@@ -50,7 +50,7 @@ export default function LoginPage() {
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-neutral-50 dark:bg-[#1a1b26] text-neutral-900 dark:text-[#c0caf5]">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-neutral-50 dark:bg-admin-surface text-neutral-900 dark:text-admin-text">
         {/* Background Effects */}
         <div className="absolute inset-0">
           <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl animate-pulse" />
@@ -60,7 +60,7 @@ export default function LoginPage() {
 
         {/* Login Card */}
         <div className="relative z-10 w-full max-w-md mx-4">
-          <div className="bg-[#1a1b2e]/80 backdrop-blur-xl border border-[#292e42] rounded-2xl p-8 sm:p-10 shadow-2xl shadow-violet-500/5">
+          <div className="bg-admin-surface/80 backdrop-blur-xl border border-admin-border rounded-2xl p-8 sm:p-10 shadow-2xl shadow-violet-500/5">
             {/* Header */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-violet-600 to-indigo-600 mb-5 shadow-lg shadow-violet-500/25">
@@ -69,7 +69,7 @@ export default function LoginPage() {
               <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
                 เข้าสู่ระบบผู้ดูแล
               </h1>
-              <p className="text-sm text-neutral-500 dark:text-[#a9b1d6]/70">
+              <p className="text-sm text-neutral-500 dark:text-admin-text-muted/70">
                 กรุณาเข้าสู่ระบบด้วยบัญชี Google ที่ได้รับอนุญาต
               </p>
             </div>
@@ -106,7 +106,7 @@ export default function LoginPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     />
                   </svg>
-                  <span className="text-sm text-[#a9b1d6]">
+                  <span className="text-sm text-admin-text-muted">
                     กำลังเข้าสู่ระบบ...
                   </span>
                 </div>
@@ -124,8 +124,8 @@ export default function LoginPage() {
             </div>
 
             {/* Footer */}
-            <div className="mt-8 pt-6 border-t border-[#292e42]">
-              <p className="text-center text-xs text-[#565f89]">
+            <div className="mt-8 pt-6 border-t border-admin-border">
+              <p className="text-center text-xs text-admin-text-dim">
                 เฉพาะบัญชีที่ได้รับอนุญาตเท่านั้นที่สามารถเข้าใช้งานได้
               </p>
             </div>

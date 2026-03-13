@@ -20,13 +20,13 @@ export default function DashboardLayout({
 }) {
   return (
     <div
-      className={`${notoSansThai.variable} ${notoSansThai.className} min-h-screen bg-neutral-50 dark:bg-[#1a1b26] text-neutral-900 dark:text-[#c0caf5] selection:bg-violet-500/30`}
+      className={`${notoSansThai.variable} ${notoSansThai.className} min-h-screen bg-neutral-50 dark:bg-admin-surface text-neutral-900 dark:text-admin-text selection:bg-violet-500/30`}
       style={{ fontFamily: "var(--font-noto-sans-thai)" }}
     >
       <AlertProvider>
         <div className="flex flex-col md:flex-row min-h-screen overflow-hidden">
           <AdminSidebar />
-          <main className="flex-1 overflow-y-auto h-screen relative bg-neutral-50 dark:bg-[#1a1b26]">
+          <main className="flex-1 overflow-y-auto h-screen relative bg-neutral-50 dark:bg-admin-surface">
             <AdminNavbar />
             <div className="p-4 pb-24 md:pb-12">
               {children}

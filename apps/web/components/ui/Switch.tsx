@@ -51,7 +51,7 @@ export default function Switch({
         />
         <div
           className={`h-full w-full rounded-full transition-colors duration-200 ease-in-out ${
-            checked ? "bg-violet-500" : "bg-neutral-200 dark:bg-[#292e42]"
+            checked ? "bg-violet-500" : "bg-neutral-200 dark:bg-admin-border"
           }`}
         />
         <span
