@@ -47,7 +47,6 @@ driveImageApp.get('/folder/:folderId/images', async (c) => {
     const folderId = c.req.param('folderId')
     const pageToken = c.req.query('pageToken')
     const drive = getAuthenticatedDrive()
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000"
 
     const q = `'${folderId}' in parents and mimeType contains 'image/' and trashed = false`
 
@@ -65,7 +64,8 @@ driveImageApp.get('/folder/:folderId/images', async (c) => {
     if (!files) return c.json({ data: { images: [], nextPageToken: undefined }, message: "" })
 
     const images = files.map((file) => {
-      const imageSrc = `${API_URL}/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`
+      // Use a relative path so Next.js <Image> optimizer treats it as a local asset and avoids 400 Bad Request errors mapping external hostnames
+      const imageSrc = `/api/drive-image/${file.id}?name=${encodeURIComponent(file.name || "image.jpg")}`
 
       return {
         id: file.id!,
