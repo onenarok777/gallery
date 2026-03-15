@@ -11,4 +11,5 @@ ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
 ENV NEXT_PUBLIC_GOOGLE_CLIENT_ID=$NEXT_PUBLIC_GOOGLE_CLIENT_ID
 RUN npm install
-CMD ["npm", "run", "dev", "--workspace=@gallery/web"]
+RUN npm run build --workspace=@gallery/web
+CMD ["npm", "run", "start", "--workspace=@gallery/web"]
