@@ -28,12 +28,12 @@ export default function Toggle({
       {(label || description) && (
         <div className="flex flex-col gap-0.5">
           {label && (
-            <label className="text-sm font-bold text-neutral-900 dark:text-[#c0caf5]">
+            <label className="text-sm font-bold text-neutral-900 dark:text-admin-text">
               {label}
             </label>
           )}
           {description && (
-            <p className="text-xs text-neutral-500 dark:text-[#565f89]">
+            <p className="text-xs text-neutral-500 dark:text-admin-text-dim">
               {description}
             </p>
           )}
@@ -46,7 +46,7 @@ export default function Toggle({
         className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-all duration-300 focus:outline-hidden focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${
           checked 
             ? "bg-violet-600 dark:bg-violet-500 shadow-sm shadow-violet-500/20" 
-            : "bg-neutral-200 dark:bg-[#292e42]"
+            : "bg-neutral-200 dark:bg-admin-border"
         } ${disabled ? "opacity-50 cursor-not-allowed" : ""}`}
       >
         <span

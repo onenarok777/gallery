@@ -15,6 +15,13 @@
       "when": 1773299624847,
       "tag": "0001_stale_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1773386439590,
+      "tag": "0002_long_archangel",
+      "breakpoints": true
     }
   ]
 }

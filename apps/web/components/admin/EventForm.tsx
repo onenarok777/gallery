@@ -2,11 +2,14 @@
 
 import { useState } from "react";
 import Input from "../ui/Input";
+import Switch from "../ui/Switch";
 import { useAlert } from "../ui/AlertContext";
 
 interface EventFormData {
   title: string;
   googleFolderLink: string;
+  isFaceSearchEnabled: boolean;
+  isPaginationEnabled: boolean;
 }
 
 export default function EventForm({
@@ -21,6 +24,8 @@ export default function EventForm({
     googleLink?: string;
     googleFolderLink?: string;
     driveLink?: string;
+    isFaceSearchEnabled?: boolean;
+    isPaginationEnabled?: boolean;
   };
   eventId?: string;
   onSuccess?: () => void;
@@ -30,6 +35,8 @@ export default function EventForm({
   const [formData, setFormData] = useState<EventFormData>({
     title: initialData?.title || "",
     googleFolderLink: initialData?.googleFolderLink || initialData?.driveLink || "",
+    isFaceSearchEnabled: initialData?.isFaceSearchEnabled ?? true,
+    isPaginationEnabled: initialData?.isPaginationEnabled ?? false,
   });
   const [error, setError] = useState("");
   const alert = useAlert();
@@ -113,6 +120,22 @@ export default function EventForm({
           required
           helperText="วางลิงก์โฟลเดอร์ Google Drive ที่เปิดสิทธิ์แชร์แล้ว"
         />
+
+        <div className="pt-4 border-t border-neutral-100 dark:border-admin-border space-y-5">
+          <Switch
+            checked={formData.isFaceSearchEnabled}
+            onChange={(checked) => setFormData({ ...formData, isFaceSearchEnabled: checked })}
+            label="ระบบค้นหาด้วยใบหน้า"
+            description="เปิดใช้งานระบบค้นหารูปภาพด้วยใบหน้า (Face Search) จาก AI"
+          />
+
+          <Switch
+            checked={formData.isPaginationEnabled}
+            onChange={(checked) => setFormData({ ...formData, isPaginationEnabled: checked })}
+            label="รูปแบบการแสดงภาพ (Pagination)"
+            description="หากปิดจะเป็นการเลื่อนหน้าจออัตโนมัติ (Infinite Scroll / Lazy Load) หากเปิดจะเป็นการแบ่งหน้า"
+          />
+        </div>
       </div>
 
       <button type="submit" className="hidden" />

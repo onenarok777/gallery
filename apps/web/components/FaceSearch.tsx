@@ -113,7 +113,8 @@ export default function FaceSearch({
       formData.append("threshold", threshold.toString());
       formData.append("limit", "30");
 
-      const response = await fetch("/api/face-search", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+      const response = await fetch(`${apiUrl}/api/face-search`, {
         method: "POST",
         body: formData,
       });
@@ -176,7 +177,7 @@ export default function FaceSearch({
           {/* Header */}
           <div className="flex items-center justify-between p-5 border-b border-neutral-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500 to-pink-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-linear-to-br from-violet-500 to-pink-500 flex items-center justify-center">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -246,7 +247,7 @@ export default function FaceSearch({
             ) : (
               /* Preview */
               <div className="flex flex-col sm:flex-row gap-4 items-center">
-                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-violet-500 flex-shrink-0">
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-violet-500 shrink-0">
                   <img
                     src={previewUrl}
                     alt="Preview"
@@ -303,7 +304,7 @@ export default function FaceSearch({
                       transition-all duration-200 flex items-center justify-center gap-2
                       ${loading
                         ? "bg-neutral-300 dark:bg-neutral-700 text-neutral-500 cursor-not-allowed"
-                        : "bg-gradient-to-r from-violet-500 to-pink-500 text-white hover:from-violet-600 hover:to-pink-600 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+                        : "bg-linear-to-r from-violet-500 to-pink-500 text-white hover:from-violet-600 hover:to-pink-600 shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
                       }
                     `}
                   >
@@ -363,7 +364,7 @@ export default function FaceSearch({
                         loading="lazy"
                       />
                       {/* Score badge */}
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-1.5">
+                      <div className="absolute bottom-0 inset-x-0 bg-linear-to-t from-black/70 to-transparent p-1.5">
                         <div className="flex items-center justify-end">
                           <span
                             className={`

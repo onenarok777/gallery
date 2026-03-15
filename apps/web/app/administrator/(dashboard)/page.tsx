@@ -20,7 +20,7 @@ export default function AdminDashboardPage() {
         >
           Dashboard Overview
         </Heading>
-        <Text className="text-neutral-500 dark:text-[#a9b1d6]">
+        <Text className="text-neutral-500 dark:text-admin-text-muted">
           ยินดีต้อนรับสู่ระบบจัดการแกลเลอรี สรุปข้อมูลทั้งหมด
         </Text>
       </div>
@@ -28,15 +28,15 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Total Events Card */}
         <div
-          className="relative overflow-hidden group p-8 rounded-lg bg-white dark:bg-[#1f2335] border border-neutral-200 dark:border-[#292e42] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          className="relative overflow-hidden group p-8 rounded-lg bg-white dark:bg-admin-surface-hover border border-neutral-200 dark:border-admin-border shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
         >
-          <div className="absolute -right-6 -top-6 opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-neutral-900 dark:text-[#c0caf5]">
+          <div className="absolute -right-6 -top-6 opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-neutral-900 dark:text-admin-text">
             <CalendarDays size={160} />
           </div>
           
           <div className="relative z-10 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 dark:text-[#565f89]">
+              <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 dark:text-admin-text-dim">
                 Total Events
               </span>
               <div className="bg-violet-100 dark:bg-[#7aa2f7]/10 p-2.5 rounded-2xl text-violet-600 dark:text-[#7aa2f7] shadow-sm ring-1 ring-violet-200 dark:ring-[#7aa2f7]/20">
@@ -44,7 +44,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             
-            <Heading as="h1" className="text-5xl font-black text-neutral-900 dark:text-[#c0caf5]">
+            <Heading as="h1" className="text-5xl font-black text-neutral-900 dark:text-admin-text">
               {stats.events}
             </Heading>
           </div>
@@ -52,15 +52,15 @@ export default function AdminDashboardPage() {
 
         {/* Total Images Card */}
         <div
-          className="relative overflow-hidden group p-8 rounded-3xl bg-white dark:bg-[#1f2335] border border-neutral-200 dark:border-[#292e42] shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+          className="relative overflow-hidden group p-8 rounded-3xl bg-white dark:bg-admin-surface-hover border border-neutral-200 dark:border-admin-border shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
         >
-          <div className="absolute -right-6 -top-6 opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-neutral-900 dark:text-[#c0caf5]">
+          <div className="absolute -right-6 -top-6 opacity-[0.03] dark:opacity-[0.05] group-hover:scale-110 transition-transform duration-500 text-neutral-900 dark:text-admin-text">
             <ImageIcon size={160} />
           </div>
           
           <div className="relative z-10 space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 dark:text-[#565f89]">
+              <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-neutral-400 dark:text-admin-text-dim">
                 Total Images (Drive)
               </span>
               <div className="bg-indigo-100 dark:bg-[#bb9af7]/10 p-2.5 rounded-2xl text-indigo-600 dark:text-[#bb9af7] shadow-sm ring-1 ring-indigo-200 dark:ring-[#bb9af7]/20">
@@ -68,7 +68,7 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             
-            <Heading as="h1" className="text-5xl font-black text-neutral-900 dark:text-[#c0caf5]">
+            <Heading as="h1" className="text-5xl font-black text-neutral-900 dark:text-admin-text">
               {stats.images > 0 ? stats.images : "N/A"}
             </Heading>
           </div>

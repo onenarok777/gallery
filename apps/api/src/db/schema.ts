@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, uuid, boolean } from 'drizzle-orm/pg-core';
 
 export const events = pgTable('events', {
   id: text('id').primaryKey(),
@@ -6,6 +6,8 @@ export const events = pgTable('events', {
   driveLink: text('drive_link').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  isFaceSearchEnabled: boolean('is_face_search_enabled').default(true).notNull(),
+  isPaginationEnabled: boolean('is_pagination_enabled').default(false).notNull(),
 });
 
 export const qrSettings = pgTable('qr_settings', {

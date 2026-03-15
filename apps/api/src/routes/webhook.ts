@@ -18,7 +18,7 @@ webhookApp.post('/register', async (c) => {
 
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
   if (!folderId) {
-    return errorResponse(c, "Missing GOOGLE_DRIVE_FOLDER_ID", 500);
+    return errorResponse(c, "Google Drive Folder ID not configured", 500);
   }
 
   if (!WEBHOOK_URL) {

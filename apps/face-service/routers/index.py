@@ -80,7 +80,7 @@ async def reindex_endpoint(background_tasks: BackgroundTasks):
             total_faces_indexed=0,
             skipped=0,
             errors=0,
-            message="Missing GOOGLE_DRIVE_FOLDER_ID",
+            message="Google Drive Folder ID not configured",
         )
 
     def _run_in_background():

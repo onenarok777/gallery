@@ -16,14 +16,14 @@ export default function AdminSettingsPage() {
         <Heading as="h2" className="mb-2">
           Settings
         </Heading>
-        <Text className="text-neutral-500 dark:text-[#a9b1d6]">
+        <Text className="text-neutral-500 dark:text-admin-text-muted">
           ตั้งค่าระบบทั่วไปและจัดการการแสดงผล
         </Text>
       </div>
 
       <div className="space-y-8">
         {/* Appearance Section */}
-        <section className="p-8 rounded-lg bg-white dark:bg-[#1f2335] shadow-sm border border-neutral-100 dark:border-[#292e42] animate-in slide-in-from-bottom-4 duration-500">
+        <section className="p-8 rounded-lg bg-white dark:bg-admin-surface-hover shadow-sm border border-neutral-100 dark:border-admin-border animate-in slide-in-from-bottom-4 duration-500">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-1.5 h-6 bg-violet-600 dark:bg-violet-500 rounded-full" />
             <Heading as="h4">การแสดงผล</Heading>
@@ -48,7 +48,7 @@ export default function AdminSettingsPage() {
             </div>
           </div>
 
-          <div className="mt-10 pt-8 border-t border-neutral-50 dark:border-[#292e42] flex justify-end">
+          <div className="mt-10 pt-8 border-t border-neutral-50 dark:border-admin-border flex justify-end">
             <Button
               variant="primary"
               className="px-8"
@@ -60,12 +60,12 @@ export default function AdminSettingsPage() {
         </section>
 
         {/* System Info Section (Optional Placeholder) */}
-        <section className="p-8 rounded-3xl bg-white dark:bg-[#1f2335]/50 border border-dashed border-neutral-200 dark:border-[#292e42] opacity-80">
+        <section className="p-8 rounded-3xl bg-white dark:bg-admin-surface-hover/50 border border-dashed border-neutral-200 dark:border-admin-border opacity-80">
           <div className="flex items-center gap-3 mb-4">
-             <div className="w-1.5 h-6 bg-neutral-300 dark:bg-[#565f89] rounded-full" />
-             <Heading as="h5" className="text-neutral-500 dark:text-[#565f89]">ข้อมูลระบบ</Heading>
+             <div className="w-1.5 h-6 bg-neutral-300 dark:bg-admin-text-dim rounded-full" />
+             <Heading as="h5" className="text-neutral-500 dark:text-admin-text-dim">ข้อมูลระบบ</Heading>
           </div>
-          <Text className="text-sm text-neutral-400 dark:text-[#565f89]">
+          <Text className="text-sm text-neutral-400 dark:text-admin-text-dim">
             เวอร์ชัน 1.0.0 (Build 20240325)
           </Text>
         </section>

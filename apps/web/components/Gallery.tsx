@@ -19,6 +19,7 @@ import "lightgallery/css/lg-thumbnail.css";
 import { getDriveImages } from "@/app/actions/google-drive";
 import GalleryItem from "./GalleryItem";
 import FaceSearch from "./FaceSearch";
+import Pagination from "./ui/Pagination";
 
 // ============================================================================
 // Types
@@ -38,6 +39,9 @@ interface GalleryProps {
   initialImages: DriveImage[];
   initialNextPageToken?: string;
   initialTotalCount?: number;
+  folderId: string;
+  eventTitle: string;
+  isPaginationEnabled?: boolean;
 }
 
 // ============================================================================
@@ -61,6 +65,9 @@ export default function Gallery({
   initialImages,
   initialNextPageToken,
   initialTotalCount = 0,
+  folderId,
+  eventTitle,
+  isPaginationEnabled = false,
 }: GalleryProps) {
   // --------------------------------------------------------------------------
   // State
@@ -72,6 +79,12 @@ export default function Gallery({
   const [hasMore, setHasMore] = useState(!!initialNextPageToken);
   const [totalCount] = useState(initialTotalCount);
   const [showFaceSearch, setShowFaceSearch] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoadingToPage, setIsLoadingToPage] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
 
   // --------------------------------------------------------------------------
   // Refs
@@ -96,15 +109,22 @@ export default function Gallery({
   // Memoized Values
   // --------------------------------------------------------------------------
 
+  const visibleImages = useMemo(() => {
+    if (!isPaginationEnabled) return images;
+    const start = (currentPage - 1) * pageSize;
+    const end = start + pageSize;
+    return images.slice(start, end);
+  }, [images, isPaginationEnabled, currentPage, pageSize]);
+
   const galleryElements = useMemo(
     () =>
-      images.map((img) => ({
+      visibleImages.map((img) => ({
         src: img.src,
         thumb: img.src,
         downloadUrl: img.src,
         subHtml: `<h4>${img.name || "Image"}</h4>`,
       })),
-    [images],
+    [visibleImages],
   );
 
   // Initial elements for LightGallery (static, prevents re-initialization)
@@ -116,7 +136,7 @@ export default function Gallery({
         downloadUrl: img.src,
         subHtml: `<h4>${img.name || "Image"}</h4>`,
       })),
-    [],
+    [initialImages],
   );
 
   // --------------------------------------------------------------------------
@@ -129,7 +149,7 @@ export default function Gallery({
 
     setLoading(true);
     try {
-      const response = await getDriveImages(nextPageToken);
+      const response = await getDriveImages(folderId, nextPageToken);
 
       if (response.images?.length > 0) {
         setImages((prev) => {
@@ -148,7 +168,42 @@ export default function Gallery({
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, nextPageToken]);
+  }, [loading, hasMore, nextPageToken, folderId]);
+
+  // Handle pagination jumps (fetch sequentially if needed)
+  const handlePageChange = async (newPage: number) => {
+    if (newPage === currentPage) return;
+    
+    const requiredCount = newPage * pageSize;
+    if (images.length < requiredCount && hasMore) {
+      setIsLoadingToPage(true);
+      let currentNextToken = nextPageToken;
+      let currentImages = [...images];
+      
+      try {
+        while (currentImages.length < requiredCount && currentNextToken) {
+          const response = await getDriveImages(folderId, currentNextToken);
+          if (response.images?.length > 0) {
+            const existingIds = new Set(currentImages.map((p) => p.id));
+            const newImages = response.images.filter(
+              (img: DriveImage) => !existingIds.has(img.id),
+            );
+            currentImages = [...currentImages, ...newImages];
+          }
+          currentNextToken = response.nextPageToken;
+        }
+        setImages(currentImages);
+        setNextPageToken(currentNextToken);
+        setHasMore(!!currentNextToken);
+      } catch (error) {
+        console.error("Failed to load pages sequentially:", error);
+      } finally {
+        setIsLoadingToPage(false);
+      }
+    }
+    
+    setCurrentPage(newPage);
+  };
 
   // Update total count display in Lightbox counter
   const updateTotalCountDisplay = useCallback(() => {
@@ -200,15 +255,15 @@ export default function Gallery({
       const { index } = detail;
       currentIndexRef.current = index;
 
-      // Trigger load more when approaching the end
+      // Trigger load more when approaching the end (only in infinite scroll mode)
       const { images, hasMore, loading } = stateRef.current;
-      if (index >= images.length - 2 && hasMore && !loading) {
+      if (!isPaginationEnabled && index >= images.length - 2 && hasMore && !loading) {
         loadMoreRef.current();
       }
 
       updateTotalCountDisplay();
     },
-    [updateTotalCountDisplay],
+    [updateTotalCountDisplay, isPaginationEnabled],
   );
 
   const onAfterClose = useCallback(() => {
@@ -251,10 +306,10 @@ export default function Gallery({
 
   // Infinite scroll trigger (page scroll only, not when lightbox is open)
   useEffect(() => {
-    if (inView && hasMore && !loading && !isLightboxOpenRef.current) {
+    if (!isPaginationEnabled && inView && hasMore && !loading && !isLightboxOpenRef.current) {
       loadMore();
     }
-  }, [inView, hasMore, loading, loadMore]);
+  }, [inView, hasMore, loading, loadMore, isPaginationEnabled]);
 
   // Refresh LightGallery when images change - ONLY when lightbox is CLOSED
   // This prevents the closing/flashing issue entirely
@@ -282,14 +337,11 @@ export default function Gallery({
       {/* Header */}
       <header className="mb-16 text-center relative">
         <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-2 tracking-wide transition-colors">
-          My Gallery
+          {eventTitle}
         </h1>
-        <p className="text-neutral-500 dark:text-neutral-400 text-sm md:text-base tracking-wider transition-colors">
-          Collection for GotTries
-        </p>
         <button
           onClick={() => setShowFaceSearch(true)}
-          className="mt-6 inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-gradient-to-r from-violet-500 to-pink-500 text-white font-medium text-sm shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-105 transition-all duration-200"
+          className="mt-6 inline-flex items-center gap-2.5 px-6 py-3 rounded-full bg-linear-to-r from-violet-500 to-pink-500 text-white font-medium text-sm shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 hover:scale-105 transition-all duration-200"
           id="face-search-btn"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -329,13 +381,31 @@ export default function Gallery({
         dynamicEl={initialGalleryElements}
       />
 
+      {/* Top Pagination UI */}
+      {isPaginationEnabled && totalPages > 1 && (
+        <div className="w-full mb-8">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            disabled={isLoadingToPage || loading}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
+          />
+        </div>
+      )}
+
       {/* Masonry Grid */}
       <Masonry
         breakpointCols={MASONRY_BREAKPOINTS}
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {images.map((image, i) => (
+        {visibleImages.map((image, i) => (
           <GalleryItem
             key={image.id}
             image={image}
@@ -346,7 +416,7 @@ export default function Gallery({
       </Masonry>
 
       {/* Loading Indicator / Scroll Sentinel */}
-      {(hasMore || loading) && (
+      {!isPaginationEnabled && (hasMore || loading) && (
         <div
           ref={sentinelRef}
           className="w-full py-10 flex justify-center items-center"
@@ -378,6 +448,37 @@ export default function Gallery({
               </span>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Pagination UI */}
+      {isPaginationEnabled && totalPages > 1 && (
+        <div className="w-full flex flex-col items-center gap-6 border-t border-neutral-100 dark:border-admin-border mt-8 pt-8">
+          {(isLoadingToPage || loading) && (
+             <div className="flex items-center gap-2 text-sm text-neutral-500">
+               <svg className="animate-spin h-5 w-5 text-neutral-400"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+               </svg>
+               กำลังโหลดข้อมูล...
+             </div>
+          )}
+          <Pagination
+            className="w-full"
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            disabled={isLoadingToPage || loading}
+            pageSize={pageSize}
+            pageSizeOptions={[5, 10, 20, 50, 100]}
+            onPageSizeChange={(size) => {
+              setPageSize(size);
+              setCurrentPage(1);
+            }}
+          />
         </div>
       )}
 

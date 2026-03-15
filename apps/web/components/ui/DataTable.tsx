@@ -21,7 +21,11 @@ interface DataTableProps<T> {
   pagination?: {
     currentPage: number;
     totalPages: number;
+    total?: number;
     onPageChange: (page: number) => void;
+    pageSize?: number;
+    pageSizeOptions?: number[];
+    onPageSizeChange?: (size: number) => void;
   };
 }
 
@@ -35,16 +39,16 @@ export default function DataTable<T extends { id: string | number }>({
 }: DataTableProps<T>) {
   return (
     <div className="space-y-4">
-      <div className="overflow-hidden rounded-lg border border-neutral-100 dark:border-[#292e42] bg-white dark:bg-[#1a1b26] shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-neutral-100 dark:border-admin-border bg-white dark:bg-admin-surface shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             {showHeader && (
               <thead>
-                <tr className="bg-neutral-50/50 dark:bg-[#1f2335]/50 border-b border-neutral-100 dark:border-[#292e42]">
+                <tr className="bg-neutral-50/50 dark:bg-admin-surface-hover/50 border-b border-neutral-100 dark:border-admin-border">
                   {columns.map((column) => (
                     <th
                       key={column.key}
-                      className={`px-4 py-2 text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-[#565f89] ${column.headerClassName || ""}`}
+                      className={`px-4 py-2 text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-400 dark:text-admin-text-dim ${column.headerClassName || ""}`}
                     >
                       {column.header}
                     </th>
@@ -52,13 +56,13 @@ export default function DataTable<T extends { id: string | number }>({
                 </tr>
               </thead>
             )}
-            <tbody className="divide-y divide-neutral-50 dark:divide-[#292e42]/50">
+            <tbody className="divide-y divide-neutral-50 dark:divide-admin-border/50">
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-in fade-in duration-500">
                     {columns.map((column) => (
                       <td key={column.key} className="px-6 py-4">
-                        <div className="h-4 bg-neutral-100 dark:bg-[#1f2335] rounded-lg animate-pulse" />
+                        <div className="h-4 bg-neutral-100 dark:bg-admin-surface-hover rounded-lg animate-pulse" />
                       </td>
                     ))}
                   </tr>
@@ -70,7 +74,7 @@ export default function DataTable<T extends { id: string | number }>({
                     className="px-6 py-12 text-center"
                   >
                     <div className="flex flex-col items-center gap-2">
-                       <Text className="text-sm font-medium text-neutral-400 dark:text-[#565f89]">
+                       <Text className="text-sm font-medium text-neutral-400 dark:text-admin-text-dim">
                         {emptyMessage}
                       </Text>
                     </div>
@@ -80,12 +84,12 @@ export default function DataTable<T extends { id: string | number }>({
                 data.map((item) => (
                   <tr
                     key={item.id}
-                    className="group hover:bg-neutral-50/50 dark:hover:bg-[#1f2335]/50 transition-colors duration-200"
+                    className="group hover:bg-neutral-50/50 dark:hover:bg-admin-surface-hover/50 transition-colors duration-200"
                   >
                     {columns.map((column) => (
                       <td
                         key={`${item.id}-${column.key}`}
-                        className={`px-4 py-2 text-sm text-neutral-700 dark:text-[#c0caf5] ${column.className || ""}`}
+                        className={`px-4 py-2 text-sm text-neutral-700 dark:text-admin-text ${column.className || ""}`}
                       >
                         {column.render ? column.render(item) : (item as Record<string, any>)[column.key]}
                       </td>
@@ -99,15 +103,18 @@ export default function DataTable<T extends { id: string | number }>({
       </div>
 
       {pagination && (
-        <div className="flex items-center justify-between px-2 py-4">
-          <Text className="text-xs text-neutral-400 dark:text-[#565f89] font-semibold">
-            แสดง {data.length} รายการ
+        <div className="flex flex-row items-center justify-between gap-4">
+          <Text className="text-xs text-neutral-400 dark:text-admin-text-dim font-semibold whitespace-nowrap">
+            แสดง {data.length}{pagination.total !== undefined ? ` จาก ${pagination.total}` : ''} รายการ
           </Text>
           <Pagination
             currentPage={pagination.currentPage}
             totalPages={pagination.totalPages}
             onPageChange={pagination.onPageChange}
             disabled={isLoading}
+            pageSize={pagination.pageSize}
+            pageSizeOptions={pagination.pageSizeOptions}
+            onPageSizeChange={pagination.onPageSizeChange}
           />
         </div>
       )}

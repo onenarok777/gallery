@@ -25,9 +25,9 @@ const Button = ({
   
   const variants = {
     primary: "bg-violet-600 hover:bg-violet-700 text-white shadow-sm ring-violet-500/20 active:scale-[0.98]",
-    secondary: "bg-white dark:bg-[#24283b] border border-neutral-200 dark:border-[#292e42] text-neutral-700 dark:text-[#c0caf5] hover:bg-neutral-50 dark:hover:bg-[#292e42] shadow-sm",
+    secondary: "bg-white dark:bg-admin-surface-muted border border-neutral-200 dark:border-admin-border text-neutral-700 dark:text-admin-text hover:bg-neutral-50 dark:hover:bg-admin-border shadow-sm",
     soft: "bg-violet-50 dark:bg-violet-900/10 text-violet-600 dark:text-[#bb9af7] hover:bg-violet-100 dark:hover:bg-violet-900/20",
-    ghost: "bg-transparent text-neutral-600 dark:text-[#a9b1d6] hover:bg-neutral-100 dark:hover:bg-[#1f2335]",
+    ghost: "bg-transparent text-neutral-600 dark:text-admin-text-muted hover:bg-neutral-100 dark:hover:bg-admin-surface-hover",
     error: "bg-red-500 hover:bg-red-600 text-white shadow-sm ring-red-500/20 active:scale-[0.98]",
   };
   
