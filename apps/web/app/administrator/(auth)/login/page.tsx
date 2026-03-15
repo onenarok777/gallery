@@ -48,6 +48,20 @@ export default function LoginPage() {
     }
   };
 
+  if (!GOOGLE_CLIENT_ID) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-[#0a0a0f] text-neutral-900 dark:text-white">
+        <div className="bg-white dark:bg-white/5 border border-red-500/20 p-8 rounded-2xl max-w-md text-center">
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h1 className="text-xl font-bold mb-2">ยังไม่ได้ตั้งค่า Google Login</h1>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            กรุณาตั้งค่า <code className="bg-neutral-100 dark:bg-black p-1 rounded">NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> ในไฟล์ .env ของคุณ
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-neutral-50 dark:bg-admin-surface text-neutral-900 dark:text-admin-text">
@@ -63,7 +77,7 @@ export default function LoginPage() {
           <div className="bg-admin-surface/80 backdrop-blur-xl border border-admin-border rounded-2xl p-8 sm:p-10 shadow-2xl shadow-violet-500/5">
             {/* Header */}
             <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br from-violet-600 to-indigo-600 mb-5 shadow-lg shadow-violet-500/25">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-600 to-indigo-600 mb-5 shadow-lg shadow-violet-500/25">
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-2xl font-bold text-neutral-900 dark:text-white mb-2">
@@ -77,8 +91,8 @@ export default function LoginPage() {
             {/* Error Message */}
             {error && (
               <div className="mb-6 flex items-start gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20">
-                <AlertCircle className="w-5 h-5 text-red-400 mt-0.5 shrink-0" />
-                <p className="text-sm text-red-300">{error}</p>
+                <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 shrink-0" />
+                <p className="text-sm text-red-600 dark:text-red-300">{error}</p>
               </div>
             )}
 
@@ -87,7 +101,7 @@ export default function LoginPage() {
               {isLoading ? (
                 <div className="flex items-center gap-3 py-3">
                   <svg
-                    className="animate-spin h-5 w-5 text-violet-400"
+                    className="animate-spin h-5 w-5 text-violet-500 dark:text-violet-400"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
