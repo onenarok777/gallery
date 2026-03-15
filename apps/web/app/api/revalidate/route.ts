@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET;
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API_URL = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 // Handle GET for manual revalidation with secret
 export async function GET(request: NextRequest) {

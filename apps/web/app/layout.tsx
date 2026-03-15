@@ -21,8 +21,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "My Gallery",
-  description: "A premium collection from Google Drive",
+  title: "Event Gallery — ระบบแกลเลอรีงานอีเวนต์",
+  description: "ระบบแสดงภาพงานอีเวนต์สำหรับช่างภาพ พร้อมค้นหาด้วยใบหน้า QR Code และแกลเลอรีแยกตามงาน",
 };
 
 export default function RootLayout({

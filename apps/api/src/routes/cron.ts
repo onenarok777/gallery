@@ -16,12 +16,6 @@ cronApp.get('/refresh-images', async (c) => {
   }
 
   try {
-    // 1. Clear Hono's own disk/memory cache for images
-    try {
-      await fetch(`http://localhost:${process.env.PORT || 4000}/api/drive-image/clear-cache`, { method: 'POST' });
-    } catch(e) {
-      console.warn("Could not clear internal drive-image cache", e);
-    }
     
     // 2. Forward revalidation to Next.js Frontend
     // Next.js needs to clear its own Data Cache (fetch cache)

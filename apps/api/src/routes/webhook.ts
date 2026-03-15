@@ -8,7 +8,7 @@ const webhookApp = new Hono()
 const REVALIDATE_SECRET = process.env.REVALIDATE_SECRET;
 const WEBHOOK_URL = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL;
 
-// Register a webhook to watch the Google Drive folder for changes
+// Register a webhook to watch a Google Drive folder for changes
 webhookApp.post('/register', async (c) => {
   const secret = c.req.query("secret");
 
@@ -16,9 +16,10 @@ webhookApp.post('/register', async (c) => {
     return errorResponse(c, "Invalid or missing secret", 401);
   }
 
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+  // Folder ID is now per-event, passed as a query parameter
+  const folderId = c.req.query("folderId");
   if (!folderId) {
-    return errorResponse(c, "Google Drive Folder ID not configured", 500);
+    return errorResponse(c, "Missing folderId query parameter", 400);
   }
 
   if (!WEBHOOK_URL) {
@@ -112,7 +113,6 @@ webhookApp.get('/register', (c) => {
       webhook: webhookUrl,
     },
     currentConfig: {
-      hasFolderId: !!process.env.GOOGLE_DRIVE_FOLDER_ID,
       hasSecret: !!REVALIDATE_SECRET,
       hasSiteUrl: !!WEBHOOK_URL,
     }

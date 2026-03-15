@@ -4,7 +4,6 @@ API Router: Image Indexing
 POST /api/index-image — Index a single image from Google Drive
 POST /api/reindex    — Re-index all images from Google Drive (background)
 """
-import os
 import logging
 import threading
 from fastapi import APIRouter, UploadFile, File, Form, BackgroundTasks, HTTPException
@@ -57,9 +56,12 @@ async def index_image_endpoint(
 
 
 @router.post("/api/reindex", response_model=ReindexResponse)
-async def reindex_endpoint(background_tasks: BackgroundTasks):
+async def reindex_endpoint(
+    folder_id: str = Form(..., description="Google Drive folder ID to index"),
+    background_tasks: BackgroundTasks = None,
+):
     """
-    Trigger a full re-index of all images from Google Drive.
+    Trigger a full re-index of all images from a Google Drive folder.
     Runs in background to avoid timeout. Skips already-indexed images.
     """
     global _reindex_running
@@ -73,14 +75,13 @@ async def reindex_endpoint(background_tasks: BackgroundTasks):
             message="Re-indexing is already in progress. Please wait.",
         )
 
-    folder_id = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
     if not folder_id:
         return ReindexResponse(
             total_images=0,
             total_faces_indexed=0,
             skipped=0,
             errors=0,
-            message="Google Drive Folder ID not configured",
+            message="folder_id is required",
         )
 
     def _run_in_background():

@@ -4,7 +4,6 @@ Background Indexer Worker
 Crawls Google Drive images, extracts face embeddings, 
 and stores them in Qdrant. Supports incremental indexing.
 """
-import os
 import time
 import logging
 from services.face_engine import extract_embeddings
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def run_indexing(
     vector_store: VectorStore,
-    folder_id: str | None = None,
+    folder_id: str,
     delay_seconds: float = 2.0,
 ) -> dict:
     """
@@ -24,16 +23,15 @@ def run_indexing(
     
     Args:
         vector_store: Qdrant vector store instance
-        folder_id: Google Drive folder ID (default from env)
+        folder_id: Google Drive folder ID (required)
         delay_seconds: Delay between processing each image (RAM protection)
     
     Returns:
         Stats dict: total_images, total_faces_indexed, skipped, errors
     """
-    folder_id = folder_id or os.getenv("GOOGLE_DRIVE_FOLDER_ID")
     if not folder_id:
-        logger.warning("Google Drive Folder ID not configured, skipping.")
-        return stats
+        logger.warning("No folder_id provided, skipping.")
+        return {"total_images": 0, "total_faces_indexed": 0, "skipped": 0, "errors": 0}
 
     stats = {
         "total_images": 0,
