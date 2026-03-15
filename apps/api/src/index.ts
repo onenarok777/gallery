@@ -5,10 +5,19 @@ import { cors } from 'hono/cors'
 const app = new Hono()
 
 // Apply CORS to all routes
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://127.0.0.1:3000',
+  'http://localhost:5001',
+  'http://127.0.0.1:5001',
+  process.env.NEXT_PUBLIC_SITE_URL
+].filter(Boolean) as string[];
+
 app.use('/*', cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: allowedOrigins,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowHeaders: ['*'],
+  credentials: true,
 }))
 
 app.get('/health', (c) => {

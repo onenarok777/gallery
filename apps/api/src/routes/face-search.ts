@@ -4,7 +4,7 @@ import { successResponse, errorResponse } from '../lib/response';
 const faceSearchApp = new Hono()
 
 const FACE_SERVICE_URL = process.env.FACE_SERVICE_URL || "http://localhost:8000";
-const FACE_SERVICE_API_KEY = process.env.FACE_SERVICE_API_KEY || "";
+
 
 faceSearchApp.post('/', async (c) => {
   try {
@@ -30,7 +30,7 @@ faceSearchApp.post('/', async (c) => {
       {
         method: "POST",
         headers: {
-          "X-API-Key": FACE_SERVICE_API_KEY,
+          "Content-Type": "application/json",
         },
         body: forwardFormData,
       }

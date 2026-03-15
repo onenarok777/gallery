@@ -4,7 +4,7 @@ import { successResponse, errorResponse } from '../lib/response';
 const faceIndexApp = new Hono()
 
 const FACE_SERVICE_URL = process.env.FACE_SERVICE_URL || "http://localhost:8000";
-const FACE_SERVICE_API_KEY = process.env.FACE_SERVICE_API_KEY || "";
+
 
 faceIndexApp.post('/', async (c) => {
   try {
@@ -24,7 +24,7 @@ faceIndexApp.post('/', async (c) => {
       {
         method: "POST",
         headers: {
-          "X-API-Key": FACE_SERVICE_API_KEY,
+          "Content-Type": "application/json",
         },
         body: formData,
       }

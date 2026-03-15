@@ -87,31 +87,7 @@ app.add_middleware(
 )
 
 
-# API Key middleware (simple security)
-API_KEY = os.getenv("API_KEY")
 
-
-@app.middleware("http")
-async def check_api_key(request: Request, call_next):
-    """Optional API key check for inter-service communication"""
-    # Skip health check
-    if request.url.path == "/api/health":
-        return await call_next(request)
-
-    # Skip if no API key is configured
-    if not API_KEY:
-        return await call_next(request)
-
-    # Check API key from header
-    request_key = request.headers.get("X-API-Key", "")
-    if request_key != API_KEY:
-        from fastapi.responses import JSONResponse
-        return JSONResponse(
-            status_code=401,
-            content={"detail": "Invalid or missing API key"},
-        )
-
-    return await call_next(request)
 
 
 # Register routers
