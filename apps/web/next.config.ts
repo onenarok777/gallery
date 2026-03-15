@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+
+  // Proxy /api requests to the backend API service
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.INTERNAL_API_URL || 'http://api:4000'}/api/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
