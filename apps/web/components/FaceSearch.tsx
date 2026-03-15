@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
+import Image from "next/image";
 
 // ============================================================================
 // Types
@@ -248,10 +249,11 @@ export default function FaceSearch({
               /* Preview */
               <div className="flex flex-col sm:flex-row gap-4 items-center">
                 <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-violet-500 shrink-0">
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Preview"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                   <button
                     onClick={() => {
@@ -357,10 +359,12 @@ export default function FaceSearch({
                       onClick={() => onResultClick?.(result.imageSrc)}
                       className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer border border-neutral-200 dark:border-neutral-700 hover:border-violet-500 transition-all duration-200 hover:scale-[1.02]"
                     >
-                      <img
+                      <Image
                         src={result.imageSrc}
                         alt={result.image_name}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 33vw, 25vw"
                         loading="lazy"
                       />
                       {/* Score badge */}

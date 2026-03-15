@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import Masonry from "react-masonry-css";
+const MasonryGrid = Masonry as any;
 import LightGallery from "lightgallery/react";
 import lgZoom from "lightgallery/plugins/zoom";
 import lgRotate from "lightgallery/plugins/rotate";
@@ -127,16 +128,18 @@ export default function Gallery({
     [visibleImages],
   );
 
-  // Initial elements for LightGallery (static, prevents re-initialization)
+  // Elements for LightGallery (synchronized with visibleImages)
+  // When paginated, LightGallery only needs to know about the current page's images
+  // When infinite scroll, it knows about all loaded images
   const initialGalleryElements = useMemo(
     () =>
-      initialImages.map((img) => ({
+      visibleImages.map((img) => ({
         src: img.src,
         thumb: img.src,
         downloadUrl: img.src,
         subHtml: `<h4>${img.name || "Image"}</h4>`,
       })),
-    [initialImages],
+    [visibleImages],
   );
 
   // --------------------------------------------------------------------------
@@ -273,15 +276,9 @@ export default function Gallery({
     isLightboxOpenRef.current = false;
     document.body.style.overflow = "auto";
 
-    // Refresh the gallery now that it's closed (to include any images loaded while it was open)
+    // Refresh the gallery now that it's closed
     if (lightGalleryRef.current) {
-      const currentElements = stateRef.current.images.map((img) => ({
-        src: img.src,
-        thumb: img.src,
-        downloadUrl: img.src,
-        subHtml: `<h4>${img.name || "Image"}</h4>`,
-      }));
-      lightGalleryRef.current.refresh(currentElements);
+      lightGalleryRef.current.refresh(galleryElements);
     }
 
     // Resume loading if there's more
@@ -400,7 +397,7 @@ export default function Gallery({
       )}
 
       {/* Masonry Grid */}
-      <Masonry
+      <MasonryGrid
         breakpointCols={MASONRY_BREAKPOINTS}
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
@@ -413,7 +410,7 @@ export default function Gallery({
             onClick={openLightbox}
           />
         ))}
-      </Masonry>
+      </MasonryGrid>
 
       {/* Loading Indicator / Scroll Sentinel */}
       {!isPaginationEnabled && (hasMore || loading) && (

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 interface DriveImage {
   id: string | null | undefined;
@@ -114,19 +115,19 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
           </div>
         )}
 
-        {/* Native Image Display */}
-        <img
-          ref={imgRef}
+        {/* Optimized Next.js Image Component */}
+        <Image
           src={src}
           alt={image.name || "Gallery Image"}
-          className={`w-full h-full cursor-pointer object-cover transition-all duration-700 ease-in-out group-hover:scale-105 ${
+          fill
+          sizes="(max-width: 500px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw"
+          className={`cursor-pointer object-cover transition-all duration-700 ease-in-out group-hover:scale-105 ${
             isLoaded && !hasError ? "opacity-100" : "opacity-0"
           }`}
-          onLoad={handleLoad}
+          onLoad={() => setIsLoaded(true)}
           onClick={() => onClick(index)}
           onError={handleError}
           loading="lazy"
-          style={{ display: "block" }} 
         />
         
         {!hasError && (
