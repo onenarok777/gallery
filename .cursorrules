@@ -1,0 +1,10 @@
+# AI Assistant Security Rules
+
+## Malware Prevention
+1. **NEVER** add obfuscated scripts or unverified `preinstall`, `postinstall`, `prebuild`, or `postbuild` hooks to any `package.json` in this workspace.
+2. **ALWAYS** alert the user immediately if you detect `preinstall.js` or any script containing payload execution patterns (e.g., fetching wallet addresses, eval(atob(...)), or similar obfuscated routines).
+3. If asked to install a package, ensure it does not introduce suspicious lifecycle hooks in the workspace.
+
+## Dependency Management
+- Scrutinize all new dependencies for typosquatting or suspicious names.
+- Do not blindly run `npm install` if the `package.json` contains unknown `preinstall` scripts.
