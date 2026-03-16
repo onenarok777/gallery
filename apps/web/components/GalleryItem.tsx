@@ -22,45 +22,12 @@ interface GalleryItemProps {
 export default function GalleryItem({ image, index, onClick }: GalleryItemProps) {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
   const src = image.src; 
   
   // Get file extension from name
   const fileExt = image.name?.split('.').pop()?.toUpperCase() || "Unknown";
 
-  // Check if image is already loaded (from cache) or complete
-  useEffect(() => {
-    const img = imgRef.current;
-    if (img && img.complete) {
-      if (img.naturalHeight > 0) {
-        setIsLoaded(true);
-      } else {
-        // Image loaded but has no dimensions = unsupported format
-        setHasError(true);
-        setIsLoaded(true);
-      }
-    }
-    
-    // Fallback: check again after a delay for unsupported formats
-    const timeout = setTimeout(() => {
-      const img = imgRef.current;
-      if (img && img.complete && img.naturalHeight === 0) {
-        setHasError(true);
-        setIsLoaded(true);
-      } else if (!isLoaded) {
-        setIsLoaded(true);
-      }
-    }, 5000);
-    
-    return () => clearTimeout(timeout);
-  }, [src, isLoaded]);
-
   const handleLoad = () => {
-    const img = imgRef.current;
-    if (img && img.naturalHeight === 0) {
-      // Loaded but no dimensions = unsupported
-      setHasError(true);
-    }
     setIsLoaded(true);
   };
 
@@ -91,7 +58,7 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
              </svg>
              <span className="mt-2 text-[10px] md:text-xs text-neutral-400 dark:text-neutral-600 font-light tracking-widest uppercase animate-pulse relative z-20">
-               Loading...
+                Loading...
              </span>
           </div>
         )}
@@ -124,7 +91,7 @@ export default function GalleryItem({ image, index, onClick }: GalleryItemProps)
           className={`cursor-pointer object-cover transition-all duration-700 ease-in-out group-hover:scale-105 ${
             isLoaded && !hasError ? "opacity-100" : "opacity-0"
           }`}
-          onLoad={() => setIsLoaded(true)}
+          onLoad={handleLoad}
           onClick={() => onClick(index)}
           onError={handleError}
           loading="lazy"
